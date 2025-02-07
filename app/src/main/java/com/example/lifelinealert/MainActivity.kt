@@ -29,6 +29,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,12 +112,20 @@ fun getCurrentRoute(navController: NavHostController): String? {
 @Preview(showBackground = true)
 @Composable
 fun MapPage() {
-    Column(
+    val taiwan = LatLng(22.999973101427155, 120.21985214463398)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(taiwan, 15f)
+    }
+
+    GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        cameraPositionState = cameraPositionState
     ) {
-        Text(text = "Map", fontSize = 24.sp)
+        Marker(
+            state = MarkerState(position = taiwan),
+            title = "library",
+            snippet = "國立成功大學圖書館"
+        )
     }
 }
 
