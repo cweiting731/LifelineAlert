@@ -4,25 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -56,17 +63,17 @@ fun MainPage() {
     ) { innerPadding ->
         NavHostContainer(navController, Modifier.padding(innerPadding))
     }
-
+ 
 }
 
 sealed class Page(
     val route: String,
     val title: Int,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+    val icon: Int
 ) {
-    object Map : Page("map", R.string.page_map_title, Icons.Default.LocationOn)
-    object Profile : Page("profile", R.string.page_profile_title, Icons.Default.Person)
-    object Point : Page("point", R.string.page_point_title, Icons.Default.ShoppingCart)
+    object Map : Page("map", R.string.page_map_title, R.drawable.ic_navigation_bar_map)
+    object Profile : Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
+    object Point : Page("point", R.string.page_point_title, R.drawable.ic_navigation_bar_point)
 }
 
 //@Preview(showBackground = true)
@@ -86,7 +93,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = { Text(text = stringResource(id = page.title)) },
                 icon = {
                     Icon(
-                        imageVector = page.icon,
+                        painter = painterResource(id = page.icon),
                         contentDescription = stringResource(id = page.title)
                     )
                 })
@@ -109,7 +116,7 @@ fun getCurrentRoute(navController: NavHostController): String? {
     return navBackStackEntry?.destination?.route
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun MapPage() {
     val taiwan = LatLng(22.999973101427155, 120.21985214463398)
@@ -135,9 +142,25 @@ fun ProfilePage() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+//        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Profile", fontSize = 24.sp)
+        Row(
+            modifier = Modifier.padding(50.dp)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .padding(20.dp), color = Color.LightGray
+            ) {
+                Image(
+                    imageVector = Icons.Default.Face,
+                    contentDescription = "user image",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(10.dp)
+                )
+            }
+        }
     }
 }
 
