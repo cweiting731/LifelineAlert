@@ -1,3 +1,17 @@
+import java.util.Properties
+
+// Read MAPS_API_KEY in from secrets.properties
+fun loadSecretProperties(): Properties {
+    val properties = Properties()
+    val secretsFile = rootProject.file("secrets.properties")
+    if (secretsFile.exists()) {
+        properties.load(secretsFile.inputStream())
+    }
+    return properties
+}
+val secretProperties = loadSecretProperties()
+val mapsApiKey : String = secretProperties.getProperty("MAPS_API_KEY", "EMPTY_KEY")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -13,11 +27,12 @@ android {
         targetSdk = 34 // original: targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     buildTypes {
@@ -50,7 +65,8 @@ android {
 }
 
 dependencies {
-
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
