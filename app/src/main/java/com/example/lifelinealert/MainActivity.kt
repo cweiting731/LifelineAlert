@@ -1,9 +1,14 @@
 package com.example.lifelinealert
 
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,8 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -22,6 +27,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +44,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -139,6 +152,38 @@ fun MapPage() {
 @Preview(showBackground = true)
 @Composable
 fun ProfilePage() {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    lateinit var cropImageLauncher: ManagedActivityResultLauncher<CropImageContractOptions, CropImageView.CropResult>
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            cropImageLauncher.launch(
+                CropImageContractOptions(uri, CropImageOptions().apply {
+                    aspectRatioX = 1
+                    aspectRatioY = 1
+                    fixAspectRatio = true
+                })
+            )
+            Log.v("profile_image", "launch image successfully")
+        }
+    }
+
+    // crop image after lanch
+    cropImageLauncher = rememberLauncherForActivityResult(
+        contract = CropImageContract()
+    ) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+            Log.v("profile_image", "crop image successfully")
+        }
+        else
+            Log.v("profile_image", "crop image fail")
+    }
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,13 +197,24 @@ fun ProfilePage() {
                     .clip(CircleShape)
                     .padding(20.dp), color = Color.LightGray
             ) {
-                Image(
-                    imageVector = Icons.Default.Face,
-                    contentDescription = "user image",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(10.dp)
-                )
+                Button(
+                    onClick = {
+//                        val intent =
+//                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                        launcher.launch("image/*")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                ) {
+                    Image(
+                        painter = imageUri?.let { rememberAsyncImagePainter(it) }
+                            ?: painterResource(id = R.drawable.profile_user_image_default_picture),
+                        contentDescription = "user image",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(10.dp)
+                            .clip(CircleShape)
+                    )
+                }
             }
         }
     }
