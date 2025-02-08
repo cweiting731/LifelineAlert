@@ -162,6 +162,7 @@ fun ProfilePage() {
         uri?.let {
             cropImageLauncher.launch(
                 CropImageContractOptions(uri, CropImageOptions().apply {
+                    cropShape = CropImageView.CropShape.OVAL
                     aspectRatioX = 1
                     aspectRatioY = 1
                     fixAspectRatio = true
