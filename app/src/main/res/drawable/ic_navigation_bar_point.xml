@@ -6,20 +6,20 @@
     <!-- 禮物盒底部 -->
     <path
         android:fillColor="#000000"
-        android:pathData="M4,8 H20 V20 H4 Z"/>
+        android:pathData="M4,8 H20 V20 H4 Z" />
 
     <!-- 上方橫向緞帶 -->
     <path
         android:fillColor="#000000"
-        android:pathData="M2,6 H22 V10 H2 Z"/>
+        android:pathData="M2,6 H22 V10 H2 Z" />
 
     <!-- 左上斜緞帶 -->
     <path
         android:fillColor="#000000"
-        android:pathData="M12,6 L8,1 L4,2 Z"/>
+        android:pathData="M12,6 L8,1 L4,2 Z" />
 
     <!-- 右上斜緞帶 -->
     <path
         android:fillColor="#000000"
-        android:pathData="M12,6 L16,1 L20,2 Z"/>
+        android:pathData="M12,6 L16,1 L20,2 Z" />
 </vector>

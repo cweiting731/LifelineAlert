@@ -10,13 +10,22 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -36,6 +45,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +66,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +88,7 @@ fun MainPage() {
     ) { innerPadding ->
         NavHostContainer(navController, Modifier.padding(innerPadding))
     }
- 
+
 }
 
 sealed class Page(
@@ -85,7 +97,9 @@ sealed class Page(
     val icon: Int
 ) {
     object Map : Page("map", R.string.page_map_title, R.drawable.ic_navigation_bar_map)
-    object Profile : Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
+    object Profile :
+        Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
+
     object Point : Page("point", R.string.page_point_title, R.drawable.ic_navigation_bar_point)
 }
 
@@ -149,9 +163,22 @@ fun MapPage() {
     }
 }
 
+// Profile Page use ProfileImage and ProfileText
 @Preview(showBackground = true)
 @Composable
 fun ProfilePage() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+    ) {
+        ProfileImage()
+        ProfileText()
+    }
+}
+
+@Composable
+fun ProfileImage() {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     lateinit var cropImageLauncher: ManagedActivityResultLauncher<CropImageContractOptions, CropImageView.CropResult>
@@ -179,43 +206,33 @@ fun ProfilePage() {
         if (result.isSuccessful) {
             imageUri = result.uriContent
             Log.v("profile_image", "crop image successfully")
-        }
-        else
+        } else
             Log.v("profile_image", "crop image fail")
     }
-
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
+    Row(
+        modifier = Modifier.padding(50.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(50.dp)
+        Surface(
+            modifier = Modifier
+                .clip(CircleShape)
+                .padding(20.dp), color = Color.LightGray
         ) {
-            Surface(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .padding(20.dp), color = Color.LightGray
-            ) {
-                Button(
-                    onClick = {
-//                        val intent =
-//                            Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                        launcher.launch("image/*")
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+            Button(
+                onClick = {
+                    launcher.launch("image/*")
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+
                 ) {
-                    Image(
-                        painter = imageUri?.let { rememberAsyncImagePainter(it) }
-                            ?: painterResource(id = R.drawable.profile_user_image_default_picture),
-                        contentDescription = "user image",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .padding(10.dp)
-                            .clip(CircleShape)
-                    )
-                }
+                Image(
+                    painter = imageUri?.let { rememberAsyncImagePainter(it) }
+                        ?: painterResource(id = R.drawable.profile_user_image_default_picture),
+                    contentDescription = "user image",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .padding(10.dp)
+                        .clip(CircleShape),
+                )
             }
         }
     }
@@ -223,12 +240,125 @@ fun ProfilePage() {
 
 @Preview(showBackground = true)
 @Composable
+fun ProfileText() {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.profile_name_title),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(70.dp, 0.dp, 20.dp, 0.dp),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(id = R.string.profile_name_default),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.profile_phone_number_title),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(70.dp, 0.dp, 20.dp, 0.dp),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(id = R.string.profile_phone_number_default),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.profile_email_title),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(70.dp, 0.dp, 20.dp, 0.dp),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = stringResource(id = R.string.profile_email_default),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Left
+            )
+        }
+    }
+}
+
+
+// PointPage
+@Preview(showBackground = true)
+@Composable
 fun PointPage() {
     Column(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Point Page", fontSize = 24.sp)
+        SearchBar()
+    }
+}
+
+@Composable
+fun SearchBar(modifier: Modifier = Modifier) {
+    Row(
+        modifier = Modifier
+            .padding(24.dp, 2.dp, 24.dp, 6.dp)
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .background(Color.White),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        var searchText by remember {
+            mutableStateOf("")
+        }
+        BasicTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            modifier
+                .padding(start = 24.dp)
+                .weight(1f),
+            textStyle = TextStyle(fontSize = 15.sp)
+        ) {
+            if (searchText.isEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.place_holder_search),
+                    color = Color.Gray,
+                    fontSize = 15.sp
+                )
+            }
+            it()
+        }
+        Box(
+            Modifier
+                .padding(6.dp)
+                .fillMaxHeight()
+                .aspectRatio(1f)
+                .clip(CircleShape)
+                .background(Color.LightGray)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search, contentDescription = "search",
+                modifier = Modifier
+                    .size(24.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
     }
 }
