@@ -151,17 +151,26 @@ fun MapPage() {
         position = CameraPosition.fromLatLngZoom(taiwan, 15f)
     }
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
+    val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = bottomBarHeight)
     ) {
-        Marker(
-            state = MarkerState(position = taiwan),
-            title = "library",
-            snippet = "國立成功大學圖書館"
-        )
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            Marker(
+                state = MarkerState(position = taiwan),
+                title = "library",
+                snippet = "國立成功大學圖書館"
+            )
+        }
     }
 }
+
 
 // Profile Page use ProfileImage and ProfileText
 @Preview(showBackground = true)
