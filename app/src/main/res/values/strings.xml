@@ -13,4 +13,15 @@
     <string name="profile_email_default">lifeline.alert.app@gmail.com</string>
 
     <string name="place_holder_search">search</string>
+    <string-array name="index_bar_title">
+        <item>種類1</item>
+        <item>種類2</item>
+        <item>種類3</item>
+        <item>種類4</item>
+        <item>種類5</item>
+        <item>種類6</item>
+        <item>種類7</item>
+        <item>種類8</item>
+
+    </string-array>
 </resources>
