@@ -32,7 +32,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -212,33 +211,28 @@ fun ProfileImage() {
     Row(
         modifier = Modifier.padding(50.dp)
     ) {
-        Surface(
-            modifier = Modifier
-                .clip(CircleShape)
-                .padding(20.dp), color = Color.LightGray
-        ) {
-            Button(
-                onClick = {
-                    launcher.launch("image/*")
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+        Button(
+            onClick = {
+                launcher.launch("image/*")
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+            modifier = Modifier.clip(RoundedCornerShape(10.dp))
 
-                ) {
-                Image(
-                    painter = imageUri?.let { rememberAsyncImagePainter(it) }
-                        ?: painterResource(id = R.drawable.profile_user_image_default_picture),
-                    contentDescription = "user image",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .padding(10.dp)
-                        .clip(CircleShape),
-                )
-            }
+        ) {
+            Image(
+                painter = imageUri?.let { rememberAsyncImagePainter(it) }
+                    ?: painterResource(id = R.drawable.profile_user_image_default_picture),
+                contentDescription = "user image",
+                modifier = Modifier
+                    .size(150.dp)
+                    .padding(10.dp)
+                    .clip(CircleShape),
+            )
         }
     }
 }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun ProfileText() {
     Column {
