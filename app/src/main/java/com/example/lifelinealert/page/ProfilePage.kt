@@ -18,14 +18,17 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -38,6 +41,8 @@ import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
+import com.example.lifelinealert.data.UserProfile
+import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText
 @Preview(showBackground = true)
@@ -57,12 +62,23 @@ fun ProfilePage() {
 fun ProfileImage() {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
+    val context = LocalContext.current
+    val userProfile = remember { UserProfile(context) }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = Unit) {
+        userProfile.imageUriFlow.collect() { savedUri ->
+            savedUri?.let { imageUri = Uri.parse(it) }
+        }
+    }
+
     lateinit var cropImageLauncher: ManagedActivityResultLauncher<CropImageContractOptions, CropImageView.CropResult>
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
+            // uri not null and go to crop image
             cropImageLauncher.launch(
                 CropImageContractOptions(uri, CropImageOptions().apply {
                     cropShape = CropImageView.CropShape.OVAL
@@ -80,6 +96,9 @@ fun ProfileImage() {
         contract = CropImageContract()
     ) { result ->
         if (result.isSuccessful) {
+            scope.launch {
+                userProfile.saveImageUri(result.uriContent.toString())
+            }
             imageUri = result.uriContent
             Log.v("profile_image", "crop image successfully")
         } else
