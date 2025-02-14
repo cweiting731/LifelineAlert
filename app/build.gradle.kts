@@ -11,6 +11,7 @@ fun loadSecretProperties(): Properties {
 }
 val secretProperties = loadSecretProperties()
 val mapsApiKey : String = secretProperties.getProperty("MAPS_API_KEY", "EMPTY_KEY")
+val directionsApiKey : String = secretProperties.getProperty("DIRECTIONS_API_KEY", "EMPTY_KEY")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -21,6 +22,10 @@ android {
     namespace = "com.example.lifelinealert"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.example.lifelinealert"
         minSdk = 26
@@ -28,6 +33,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "DIRECTIONS_API_KEY", "\"${directionsApiKey}\"")
+//        manifestPlaceholders["DIRECTIONS_API_KEY"] = directionsApiKey
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
