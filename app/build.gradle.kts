@@ -65,6 +65,8 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation("com.google.code.gson:gson:2.12.1")
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
