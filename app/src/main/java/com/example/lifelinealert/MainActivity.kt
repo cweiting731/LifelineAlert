@@ -1,6 +1,7 @@
 package com.example.lifelinealert
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -21,24 +23,56 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.lifelinealert.foreground.AlertDialog
+import com.example.lifelinealert.foreground.createNotificationChannel
+import com.example.lifelinealert.foreground.requestNotificationPermission
+import com.example.lifelinealert.foreground.sendNotification
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
 
 
 class MainActivity : ComponentActivity() {
+    private var showDialog = mutableStateOf(false)
+    private var alertDialogTitle = mutableStateOf("警告")
+    private var alertDialogMessage = mutableStateOf("OnPause")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        requestNotificationPermission(this) // 請求發送訊息權限
+        createNotificationChannel(this)
+
+        sendNotification(this, "System", "OnCreate")
+
         setContent {
             MainPage()
+            AlertDialog(showDialog = showDialog, title = alertDialogTitle, message = alertDialogMessage)
         }
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.v("lowerSystem", "pause")
+
+//        sendNotification(this)
+//        showDialog.value = true
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.v("lowerSystem", "stop")
+//        val serviceIntent = Intent(this, ForeGroundService::class.java)
+//        ContextCompat.startForegroundService(this, serviceIntent)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun MainPage() {
+
     val navController = rememberNavController()
 
     Scaffold(
