@@ -20,7 +20,6 @@ class ForeGroundService : Service() {
 
         startForeground(1, notification)
 
-        sendNotification(this, "ForeGroundService", "Successfully")
         Log.d("lowerSystem", "ForeGround successfully")
         return START_STICKY
     }

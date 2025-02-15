@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.lifelinealert.foreground.NotificationManager
 import com.example.lifelinealert.page.mapViewModel.MapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -51,6 +52,8 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     val context = LocalContext.current
     // UI values
     val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
+
+    val notificationManager = NotificationManager() // 訊息傳送裝置
 
     LaunchedEffect(cameraPermissionState.status) {
         if (!cameraPermissionState.status.isGranted) {
@@ -86,6 +89,10 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                     Color.Magenta
                 )
                 targetLocations.forEach { (id, location) ->
+
+                    val context = LocalContext.current
+                    notificationManager.sendNotification(context, "Target: $id", "$location")
+
                     Marker(
                         state = MarkerState(position = location)
                     )
