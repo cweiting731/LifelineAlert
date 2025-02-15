@@ -53,7 +53,8 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     // UI values
     val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
 
-    val notificationManager = NotificationManager() // 訊息傳送裝置
+    // notificationManager
+    val notificationManager = mapUiState.notificationManager // 訊息傳送裝置
 
     LaunchedEffect(cameraPermissionState.status) {
         if (!cameraPermissionState.status.isGranted) {
@@ -90,7 +91,6 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 )
                 targetLocations.forEach { (id, location) ->
 
-                    val context = LocalContext.current
                     notificationManager.sendNotification(context, "Target: $id", "$location")
 
                     Marker(
