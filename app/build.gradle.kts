@@ -11,6 +11,7 @@ fun loadSecretProperties(): Properties {
 }
 val secretProperties = loadSecretProperties()
 val mapsApiKey : String = secretProperties.getProperty("MAPS_API_KEY", "EMPTY_KEY")
+val directionsApiKey : String = secretProperties.getProperty("DIRECTIONS_API_KEY", "EMPTY_KEY")
 
 plugins {
     alias(libs.plugins.android.application)
@@ -21,6 +22,10 @@ android {
     namespace = "com.example.lifelinealert"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.example.lifelinealert"
         minSdk = 26
@@ -28,6 +33,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "DIRECTIONS_API_KEY", "\"${directionsApiKey}\"")
+//        manifestPlaceholders["DIRECTIONS_API_KEY"] = directionsApiKey
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -65,6 +72,8 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+    implementation("com.google.code.gson:gson:2.12.1")
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
     implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
@@ -83,7 +92,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation("com.google.android.gms:play-services-location:21.0.1")
-//    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
