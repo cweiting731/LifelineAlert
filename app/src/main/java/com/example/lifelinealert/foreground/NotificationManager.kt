@@ -2,9 +2,12 @@ package com.example.lifelinealert.foreground
 
 import android.Manifest
 import android.app.Activity
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -38,8 +41,14 @@ class NotificationManager {
             val channel = NotificationChannel(
                 "foreground_channel", // 通道 ID
                 "背景通知",        // 通道名稱
-                NotificationManager.IMPORTANCE_HIGH // 設為 HIGH 讓通知跳出
-            )
+                NotificationManager.IMPORTANCE_HIGH,  // 設為 HIGH 讓通知跳出
+            ).apply {
+                description = "這是前景服務通知頻道"
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                enableLights(true)
+                enableVibration(true)
+                setShowBadge(true)
+            }
             val manager = context.getSystemService(NotificationManager::class.java)
             manager?.createNotificationChannel(channel) // 確保不為 null
         }
@@ -59,6 +68,35 @@ class NotificationManager {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         notificationManager?.notify(1, notification) // 發送通知，確保 notificationManager 不是 null
     }
+
+    fun sendNotificationHigh(context: Context, title: String, message: String, mainActivity: Class<out Activity>) {
+        val intent = Intent(context, mainActivity) // 點擊通知後跳轉到指定 Activity
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_MUTABLE// 新版需指定 FLAG_IMMUTABLE 或 FLAG_MUTABLE
+        )
+
+        // 建立通知
+        val notification = NotificationCompat.Builder(context, "foreground_channel")
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // 彈出通知
+            .setFullScreenIntent(pendingIntent, true) // 設為全螢幕通知
+            .setVibrate(longArrayOf(0, 500, 1000)) // 震動設定
+            .setDefaults(NotificationCompat.DEFAULT_SOUND) // 預設音效
+            .setLights(0xFF00FF00.toInt(), 500, 500) // 設定燈光閃爍 (綠色)
+            .setAutoCancel(true) // 點擊後自動取消通知
+            .build()
+
+        // 發送通知
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(1, notification) // 發送通知
+    }
+
 
 }
 

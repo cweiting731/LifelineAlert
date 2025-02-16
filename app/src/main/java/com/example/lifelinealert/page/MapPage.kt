@@ -1,7 +1,10 @@
 package com.example.lifelinealert.page
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.Box
@@ -21,18 +24,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.lifelinealert.foreground.NotificationManager
+import com.example.lifelinealert.R
 import com.example.lifelinealert.page.mapViewModel.MapViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -41,6 +45,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     // 座標相關資料
     val mapUiState by mapViewModel.uiState.collectAsState()
     val nckuLibrary = mapUiState.nckuLibrary
+    val test = mapUiState.test
     val targetLocations = mapUiState.locations
     val polylinePaths = mapUiState.polylinePaths
     // 權限相關
@@ -79,7 +84,13 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 Marker(
                     state = MarkerState(position = nckuLibrary),
                     title = "library",
-                    snippet = "國立成功大學圖書館"
+                    snippet = "國立成功大學圖書館",
+                    icon = resizeBitmap(R.drawable.user_location_ic, 100, 100, context)
+                )
+                Marker(
+                    state = MarkerState(position = test),
+                    title = "test",
+                    icon = resizeBitmap(R.drawable.ambulance_icon, 120, 120, context)
                 )
                 val colorList: List<Color> = listOf(
                     Color.Red,
@@ -91,18 +102,19 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 )
                 targetLocations.forEach { (id, location) ->
 
-                    notificationManager.sendNotification(context, "Target: $id", "$location")
+//                    notificationManager.sendNotification(context, "Target: $id", "$location")
 
                     Marker(
-                        state = MarkerState(position = location)
+                        state = MarkerState(position = location),
+                        icon = resizeBitmap(R.drawable.ambulance_icon, 100, 100, context)
                     )
-                    polylinePaths[id]?.let { path ->
-                        Polyline(
-                            points = path,
-                            color = colorList.random(),
-                            width = 8f
-                        )
-                    }
+//                    polylinePaths[id]?.let { path ->
+//                        Polyline(
+//                            points = path,
+//                            color = colorList.random(),
+//                            width = 8f
+//                        )
+//                    }
                 }
             }
         } else {
@@ -121,4 +133,10 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
             }
         }
     }
+}
+
+fun resizeBitmap(resourceId: Int, width: Int, height: Int, context: Context): BitmapDescriptor {
+    val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+    val resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
+    return BitmapDescriptorFactory.fromBitmap(resizedBitmap)
 }

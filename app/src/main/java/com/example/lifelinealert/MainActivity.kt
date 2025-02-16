@@ -1,6 +1,8 @@
 package com.example.lifelinealert
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -64,6 +66,19 @@ class MainActivity : ComponentActivity() {
         Log.v("lowerSystem", "stop")
 //        val serviceIntent = Intent(this, ForeGroundService::class.java)
 //        ContextCompat.startForegroundService(this, serviceIntent)
+        Handler(Looper.getMainLooper()).postDelayed({
+//            notificationManager.sendNotification(
+//                this,
+//                "警告",
+//                "前方十字路口有救護車從右側出沒！請減速！"
+//            )
+            notificationManager.sendNotificationHigh(
+                this,
+                "警告",
+                "前方十字路口有救護車從右側出沒！請減速！",
+                MainActivity::class.java
+            )
+        }, 5000)
     }
 }
 

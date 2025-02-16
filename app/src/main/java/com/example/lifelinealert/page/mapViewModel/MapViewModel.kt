@@ -1,6 +1,5 @@
 package com.example.lifelinealert.page.mapViewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifelinealert.utils.map.Directions.fetchRoute
@@ -32,9 +31,9 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 val updatedLocations = _uiState.value.locations.toMutableMap().apply {
-                    put("A", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2198 + Math.random() * 0.001))
-                    put("B", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2208 + Math.random() * 0.001))
-                    put("C", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2218 + Math.random() * 0.001))
+//                    put("A", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2198 + Math.random() * 0.001))
+//                    put("B", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2208 + Math.random() * 0.001))
+//                    put("C", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2218 + Math.random() * 0.001))
                 }
 //                Log.d("ThreadInfo", "目前執行緒: ${Thread.currentThread().name}")
                 withContext(Dispatchers.Main) {
