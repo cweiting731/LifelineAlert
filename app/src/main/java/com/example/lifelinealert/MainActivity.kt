@@ -25,17 +25,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.lifelinealert.foreground.AlertDialog
+import com.example.lifelinealert.utils.foreground.AlertDialog
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
+import com.example.lifelinealert.utils.foreground.NotificationManager
 
 
 class MainActivity : ComponentActivity() {
     private var showDialog = mutableStateOf(false)
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
-    private val notificationManager = com.example.lifelinealert.foreground.NotificationManager()
+    private val notificationManager = NotificationManager()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -120,7 +121,11 @@ fun BottomNavigationBar(navController: NavHostController) {
         val currentRoute = getCurrentRoute(navController = navController)
         pages.forEach { page ->
             NavigationBarItem(
-                onClick = { navController.navigate(page.route) },
+                onClick = {
+                    if (page.route != currentRoute) {
+                        navController.navigate(page.route)
+                    }
+                },
                 selected = (currentRoute == page.route),
                 label = { Text(text = stringResource(id = page.title)) },
                 icon = {
@@ -128,7 +133,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         painter = painterResource(id = page.icon),
                         contentDescription = stringResource(id = page.title),
 
-                    )
+                        )
                 })
         }
     }
