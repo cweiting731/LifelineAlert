@@ -34,6 +34,7 @@ class FineLocationPermissionHandler {
      * @param context The current Activity context.
      * @throws ClassCastException If the context is not an instance of Activity.
      */
+    @Deprecated("Use 'PermissionManager' instead", level = DeprecationLevel.ERROR)
     fun requestPermission(context: Context) {
         if (context !is Activity) {
             throw ClassCastException("context should be a instance of Activity")
