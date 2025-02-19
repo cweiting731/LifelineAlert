@@ -20,18 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.lifelinealert.utils.foreground.AlertDialog
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
 import com.example.lifelinealert.utils.foreground.NotificationManager
-import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
 import com.example.lifelinealert.utils.permissions.PermissionManager
 
 
@@ -45,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        PermissionManager.requestPermissions(this, permissionRequestCode)
+        PermissionManager.requestPermission(this)
 //        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
 //        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
 
@@ -55,9 +52,20 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MainPage()
-            AlertDialog(showDialog = showDialog, title = alertDialogTitle, message = alertDialogMessage)
+            PermissionManager.AlertDialog(activity = this)
         }
 
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            PermissionManager.handlePermissionResult(this, permissions, grantResults)
+        }
     }
 
     override fun onPause() {
