@@ -1,9 +1,12 @@
 package com.example.lifelinealert.page
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,26 +28,32 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.lifelinealert.R
 import com.example.lifelinealert.page.mapViewModel.MapViewModel
 import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
+import com.example.lifelinealert.utils.map.FineLocationProvider
+import com.example.lifelinealert.utils.map.FineLocationProvider.locationCallback
+import com.example.lifelinealert.utils.map.FineLocationProvider.locationRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     // 座標相關資料
     val mapUiState by mapViewModel.uiState.collectAsState()
     val nckuLibrary = mapUiState.nckuLibrary
-    val test = mapUiState.test
     val targetLocations = mapUiState.locations
     val polylinePaths = mapUiState.polylinePaths
     val cameraPositionState = rememberCameraPositionState {
@@ -59,9 +69,24 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     val fineLocationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
 
-    // 如果要把request權限移到Activity，移除這段LaunchedEffect
     LaunchedEffect(Unit) {
-        fineLocationPermissionHandler.requestPermission((context))
+        Log.v("FineLocationProvider", "compose create")
+    }
+
+    DisposableEffect(context, fineLocationPermissionState) {
+        if (context is Activity) {
+            Log.v("FineLocationProvider", "start LocationUpdates")
+            try {
+                FineLocationProvider.requestLocationUpdates(context)
+            } catch (e: Exception) {
+                Log.v("FineLocationProvider", "start LocationUpdates")
+            }
+        }
+        onDispose {
+            Log.v("FineLocationProvider", "end LocationUpdates")
+            Log.v("FineLocationProvider", "compose dispose")
+            FineLocationProvider.removeLocationUpdates()
+        }
     }
 
     Box(
@@ -76,16 +101,18 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 properties = MapProperties(isMyLocationEnabled = true), // 啟用當前位置
                 uiSettings = MapUiSettings(
                     myLocationButtonEnabled = true // 啟用定位按鈕
-                )
+                ),
+                onMyLocationButtonClick = {
+                    false
+                },
             ) {
-//                Marker(
-//                    state = MarkerState(position = nckuLibrary),
-//                    title = "library",
-//                    snippet = "國立成功大學圖書館",
-//                    icon = resizeBitmap(R.drawable.user_location_ic, 100, 100, context)
-//                )
                 Marker(
-                    state = MarkerState(position = test),
+                    state = MarkerState(position = nckuLibrary),
+                    title = "library",
+                    snippet = "國立成功大學圖書館",
+                )
+                Marker(
+                    state = MarkerState(position = LatLng(22.996188, 120.219114)),
                     title = "test",
                     icon = resizeBitmap(R.drawable.ambulance_icon, 120, 120, context)
                 )
@@ -98,20 +125,17 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                     Color.Magenta
                 )
                 targetLocations.forEach { (id, location) ->
-
-//                    notificationManager.sendNotification(context, "Target: $id", "$location")
-
                     Marker(
                         state = MarkerState(position = location),
                         icon = resizeBitmap(R.drawable.ambulance_icon, 100, 100, context)
                     )
-//                    polylinePaths[id]?.let { path ->
-//                        Polyline(
-//                            points = path,
-//                            color = colorList.random(),
-//                            width = 8f
-//                        )
-//                    }
+                    polylinePaths[id]?.let { path ->
+                        Polyline(
+                            points = path,
+                            color = colorList.random(),
+                            width = 8f
+                        )
+                    }
                 }
             }
         } else {
@@ -122,7 +146,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
             ) {
                 Text("需要精準位置權限授權，點擊跳轉設定")
             }
