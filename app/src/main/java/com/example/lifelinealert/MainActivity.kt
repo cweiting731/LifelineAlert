@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,8 @@ import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
 import com.example.lifelinealert.utils.foreground.NotificationManager
+import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
+import com.example.lifelinealert.utils.permissions.PermissionManager
 
 
 class MainActivity : ComponentActivity() {
@@ -37,11 +40,15 @@ class MainActivity : ComponentActivity() {
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
     private val notificationManager = NotificationManager()
+    private val permissionRequestCode = 10
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
+        PermissionManager.requestPermissions(this, permissionRequestCode)
+//        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
+//        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
+
         notificationManager.createNotificationChannel(this)
 
 //        notificationManager.sendNotification(this, "System", "OnCreate")
