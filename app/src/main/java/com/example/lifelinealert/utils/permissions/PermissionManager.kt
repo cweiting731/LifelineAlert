@@ -86,7 +86,7 @@ object PermissionManager {
     fun AlertDialog(activity: Activity) {
         if (showDialog.value) {
             androidx.compose.material3.AlertDialog(
-                onDismissRequest = { /* 不做任何動作, 讓使用者沒按確認不能繼續使用 */ },
+                onDismissRequest = { showDialog.value = false },
                 confirmButton = {
                     Button(onClick = {
                         showDialog.value = false
