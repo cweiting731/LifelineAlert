@@ -24,9 +24,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.foreground.AlertDialog
-import com.example.lifelinealert.foreground.createNotificationChannel
-import com.example.lifelinealert.foreground.requestNotificationPermission
-import com.example.lifelinealert.foreground.sendNotification
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
@@ -36,14 +33,15 @@ class MainActivity : ComponentActivity() {
     private var showDialog = mutableStateOf(false)
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
+    private val notificationManager = com.example.lifelinealert.foreground.NotificationManager()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        requestNotificationPermission(this) // 請求發送訊息權限
-        createNotificationChannel(this)
+        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
+        notificationManager.createNotificationChannel(this)
 
-        sendNotification(this, "System", "OnCreate")
+//        notificationManager.sendNotification(this, "System", "OnCreate")
 
         setContent {
             MainPage()
