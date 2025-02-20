@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        PermissionManager.requestPermission(this)
+        PermissionManager.requestPermissions(this)
 //        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
 //        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
 

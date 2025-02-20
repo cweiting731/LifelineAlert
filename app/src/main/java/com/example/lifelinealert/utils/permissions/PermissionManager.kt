@@ -26,7 +26,7 @@ object PermissionManager {
         "android.permission.POST_NOTIFICATIONS" to "通知",
         "android.permission.ACCESS_FINE_LOCATION" to "位置"
     )
-    fun requestPermission(activity: Activity) {
+    fun requestPermissions(activity: Activity) {
         val unGrantedPermissions = mutableListOf<String>()
         Log.v("permission", "requesting")
         // Post Notification 存取權限
