@@ -1,4 +1,4 @@
-package com.example.lifelinealert.foreground
+package com.example.lifelinealert.utils.foreground
 
 import android.app.Service
 import android.content.Intent

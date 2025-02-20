@@ -37,7 +37,7 @@
             android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <service
-            android:name=".foreground.ForeGroundService"
+            android:name=".utils.foreground.ForeGroundService"
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:exported="false"
             android:foregroundServiceType="location"/>

@@ -1,4 +1,4 @@
-package com.example.lifelinealert.foreground
+package com.example.lifelinealert.utils.foreground
 
 import android.Manifest
 import android.app.Activity
@@ -17,7 +17,9 @@ import androidx.core.content.ContextCompat
 import com.example.lifelinealert.R
 
 class NotificationManager {
+
     // 請求通知權限
+    @Deprecated("Use 'PermissionManager' instead", level = DeprecationLevel.ERROR)
     fun requestNotificationPermission(activity: Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
             if (ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS)

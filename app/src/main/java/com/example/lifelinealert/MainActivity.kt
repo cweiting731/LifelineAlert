@@ -20,27 +20,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.lifelinealert.foreground.AlertDialog
+import com.example.lifelinealert.utils.foreground.AlertDialog
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
+import com.example.lifelinealert.utils.foreground.NotificationManager
+import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
+import com.example.lifelinealert.utils.permissions.PermissionManager
 
 
 class MainActivity : ComponentActivity() {
     private var showDialog = mutableStateOf(false)
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
-    private val notificationManager = com.example.lifelinealert.foreground.NotificationManager()
+    private val notificationManager = NotificationManager()
+    private val permissionRequestCode = 10
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
+        PermissionManager.requestPermissions(this, permissionRequestCode)
+//        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
+//        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
+
         notificationManager.createNotificationChannel(this)
 
 //        notificationManager.sendNotification(this, "System", "OnCreate")
@@ -120,7 +128,11 @@ fun BottomNavigationBar(navController: NavHostController) {
         val currentRoute = getCurrentRoute(navController = navController)
         pages.forEach { page ->
             NavigationBarItem(
-                onClick = { navController.navigate(page.route) },
+                onClick = {
+                    if (page.route != currentRoute) {
+                        navController.navigate(page.route)
+                    }
+                },
                 selected = (currentRoute == page.route),
                 label = { Text(text = stringResource(id = page.title)) },
                 icon = {
@@ -128,7 +140,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         painter = painterResource(id = page.icon),
                         contentDescription = stringResource(id = page.title),
 
-                    )
+                        )
                 })
         }
     }
