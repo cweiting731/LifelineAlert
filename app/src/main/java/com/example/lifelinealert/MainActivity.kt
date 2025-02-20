@@ -77,6 +77,17 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.v("lowerSystem", "resume")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.v("lowerSystem", "restart")
+//        PermissionManager.requestPermissions(this)
+    }
+
     override fun onStop() {
         super.onStop()
         Log.v("lowerSystem", "stop")
