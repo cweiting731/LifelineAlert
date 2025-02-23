@@ -1,11 +1,15 @@
 package com.example.lifelinealert.page
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
@@ -42,19 +51,26 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
+import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
+import com.example.lifelinealert.utils.foreground.NotificationManager
 import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText
 @Preview(showBackground = true)
 @Composable
-fun ProfilePage() {
+fun ProfilePage(profileViewModel: ProfileViewModel = viewModel()) {
+    val profileUiState by profileViewModel.uiState.collectAsState()
+    val notificationManager = profileUiState.notificationManager
+    val context = LocalContext.current
+    notificationManager.createNotificationChannel(context, "emergency")
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
 //        verticalArrangement = Arrangement.Center
     ) {
         ProfileImage()
-        ProfileText()
+        ProfileText(notificationManager, context)
     }
 }
 
@@ -130,7 +146,7 @@ fun ProfileImage() {
 
 //@Preview(showBackground = true)
 @Composable
-fun ProfileText() {
+fun ProfileText(notificationManager: NotificationManager, context: Context) {
     Column {
         Row(
             modifier = Modifier
@@ -186,5 +202,50 @@ fun ProfileText() {
                 textAlign = TextAlign.Left
             )
         }
+
+        //////
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Box(modifier = Modifier
+                .clickable {
+                    notificationManager.sendNotificationEmergency(
+                        context,
+                        "警告",
+                        "前方路口有救護車從左側出沒！請減速！",
+                        "emergency",
+                        "left"
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "left",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Box(modifier = Modifier
+                .clickable {
+                    notificationManager.sendNotificationEmergency(
+                        context,
+                        "警告",
+                        "前方路口有救護車從右側出沒！請減速！",
+                        "emergency",
+                        "right"
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "right",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+
+        //////
     }
 }

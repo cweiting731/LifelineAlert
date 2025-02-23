@@ -38,6 +38,8 @@ class MainActivity : ComponentActivity() {
     private var alertDialogMessage = mutableStateOf("OnPause")
     private val notificationManager = NotificationManager()
     private val permissionRequestCode = 10
+    private val left_channelId = "left_emergency"
+    private val right_channelId = "right_emergency"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,7 +48,11 @@ class MainActivity : ComponentActivity() {
 //        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
 //        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
 
-        notificationManager.createNotificationChannel(this)
+//        notificationManager.createNotificationChannel(this)
+
+        notificationManager.createNotificationChannel(this, "foreground_channel")
+        notificationManager.createNotificationChannel(this, left_channelId)
+        notificationManager.createNotificationChannel(this, right_channelId)
 
 //        notificationManager.sendNotification(this, "System", "OnCreate")
 
@@ -99,12 +105,16 @@ class MainActivity : ComponentActivity() {
 //                "警告",
 //                "前方十字路口有救護車從右側出沒！請減速！"
 //            )
-            notificationManager.sendNotificationHigh(
+            Log.v("lowerSystem", "notification testing")
+            notificationManager.sendNotificationEmergency(
                 this,
                 "警告",
-                "前方十字路口有救護車從右側出沒！請減速！",
-                MainActivity::class.java
+                "前方路口有救護車從右側出沒！請減速！",
+//                MainActivity::class.java,
+                right_channelId,
+                "right"
             )
+//            notificationManager.sendNotification(this, "test", "test")
         }, 5000)
     }
 }
