@@ -28,8 +28,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
-import com.example.lifelinealert.utils.permissions.NotificationManager
-import com.example.lifelinealert.utils.permissions.PermissionManager
+import com.example.lifelinealert.utils.manager.NotificationManager
+import com.example.lifelinealert.utils.manager.PermissionManager
 
 
 class MainActivity : ComponentActivity() {

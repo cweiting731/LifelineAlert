@@ -1,4 +1,4 @@
-package com.example.lifelinealert.utils.permissions
+package com.example.lifelinealert.utils.manager
 
 import android.Manifest
 import android.app.Activity

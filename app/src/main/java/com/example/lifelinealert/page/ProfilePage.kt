@@ -52,7 +52,7 @@ import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
 import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
-import com.example.lifelinealert.utils.permissions.NotificationManager
+import com.example.lifelinealert.utils.manager.NotificationManager
 import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText

@@ -1,19 +1,12 @@
-package com.example.lifelinealert.utils.permissions
+package com.example.lifelinealert.utils.manager
 
-import android.Manifest
-import android.app.Activity
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import com.example.lifelinealert.R
 
 object NotificationManager {
@@ -21,41 +14,34 @@ object NotificationManager {
         "left" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.left_emergency}"),
         "right" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.right_emergency}")
     )
-    // 請求通知權限
-    @Deprecated("Use 'PermissionManager' instead", level = DeprecationLevel.ERROR)
-    fun requestNotificationPermission(activity: Activity) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    1
-                )
-            }
-            else {
-                Log.v("lowerSystem", "notification permission already on")
-            }
-        }
-    }
 
     // 創建通知通道（Android 8.0 以上需要）
     fun createNotificationChannel(context: Context, channelId: String) {
         val channel = NotificationChannel(
             channelId, // 通道 ID
             "背景通知",        // 通道名稱
-            NotificationManager.IMPORTANCE_HIGH,  // 設為 HIGH 讓通知跳出
+            NotificationManager.IMPORTANCE_HIGH,
         ).apply {
+//            val uri = Uri.Builder()
+//                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+//                .authority(context.packageName)
+//                .appendPath(context.resources.getResourceEntryName(R.raw.left_emergency))
+//                .build()
+//
+//            val attributes = AudioAttributes.Builder()
+//                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+//                .build()
+
             description = "這是前景服務通知頻道"
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             enableLights(true)
             enableVibration(true)
-            setShowBadge(true)
+            setShowBadge(true) // 小紅點 未讀通知
             setSound(null, null)
         }
         val manager = context.getSystemService(NotificationManager::class.java)
-        manager?.createNotificationChannel(channel) // 確保不為 null
+//        manager?.deleteNotificationChannel(channelId)
+        manager?.createNotificationChannel(channel)
     }
 
     // 發送通知
@@ -75,6 +61,11 @@ object NotificationManager {
 
     fun sendNotificationEmergency(context: Context, title: String, message: String, channelId: String, direction: String) {
         val soundUri: Uri = emergencySoundUri[direction] ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+//        val uri = Uri.Builder()
+//            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+//            .authority(context.packageName)
+//            .appendPath(context.resources.getResourceEntryName(R.raw.left_emergency))
+//            .build()
 
         val ringtone = RingtoneManager.getRingtone(context, soundUri)
         ringtone.play()
