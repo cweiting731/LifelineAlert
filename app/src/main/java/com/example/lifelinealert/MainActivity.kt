@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
-import com.example.lifelinealert.utils.foreground.NotificationManager
+import com.example.lifelinealert.utils.permissions.NotificationManager
 import com.example.lifelinealert.utils.permissions.PermissionManager
 
 
@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
     private var showDialog = mutableStateOf(false)
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
-    private val notificationManager = NotificationManager()
     private val permissionRequestCode = 10
     private val left_channelId = "left_emergency"
     private val right_channelId = "right_emergency"
@@ -50,9 +49,9 @@ class MainActivity : ComponentActivity() {
 
 //        notificationManager.createNotificationChannel(this)
 
-        notificationManager.createNotificationChannel(this, "foreground_channel")
-        notificationManager.createNotificationChannel(this, left_channelId)
-        notificationManager.createNotificationChannel(this, right_channelId)
+        NotificationManager.createNotificationChannel(this, "foreground_channel")
+        NotificationManager.createNotificationChannel(this, left_channelId)
+        NotificationManager.createNotificationChannel(this, right_channelId)
 
 //        notificationManager.sendNotification(this, "System", "OnCreate")
 
@@ -106,7 +105,7 @@ class MainActivity : ComponentActivity() {
 //                "前方十字路口有救護車從右側出沒！請減速！"
 //            )
             Log.v("lowerSystem", "notification testing")
-            notificationManager.sendNotificationEmergency(
+            NotificationManager.sendNotificationEmergency(
                 this,
                 "警告",
                 "前方路口有救護車從右側出沒！請減速！",

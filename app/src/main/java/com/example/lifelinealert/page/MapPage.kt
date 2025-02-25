@@ -29,12 +29,9 @@ import com.example.lifelinealert.R
 import com.example.lifelinealert.page.mapViewModel.MapViewModel
 import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
 import com.example.lifelinealert.utils.map.FineLocationProvider
-import com.example.lifelinealert.utils.map.FineLocationProvider.locationCallback
-import com.example.lifelinealert.utils.map.FineLocationProvider.locationRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -65,7 +62,6 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     // UI values
     val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
     // notificationManager
-    val notificationManager = mapUiState.notificationManager // 訊息傳送裝置
     val fineLocationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
 

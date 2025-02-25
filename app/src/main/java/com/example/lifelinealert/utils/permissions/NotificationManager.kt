@@ -1,4 +1,4 @@
-package com.example.lifelinealert.utils.foreground
+package com.example.lifelinealert.utils.permissions
 
 import android.Manifest
 import android.app.Activity
@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.lifelinealert.R
 
-class NotificationManager {
+object NotificationManager {
     private val emergencySoundUri : Map<String, Uri> = mapOf(
         "left" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.left_emergency}"),
         "right" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.right_emergency}")

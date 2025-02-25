@@ -52,7 +52,7 @@ import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
 import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
-import com.example.lifelinealert.utils.foreground.NotificationManager
+import com.example.lifelinealert.utils.permissions.NotificationManager
 import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText
@@ -60,9 +60,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfilePage(profileViewModel: ProfileViewModel = viewModel()) {
     val profileUiState by profileViewModel.uiState.collectAsState()
-    val notificationManager = profileUiState.notificationManager
     val context = LocalContext.current
-    notificationManager.createNotificationChannel(context, "emergency")
+    NotificationManager.createNotificationChannel(context, "emergency")
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -70,7 +69,7 @@ fun ProfilePage(profileViewModel: ProfileViewModel = viewModel()) {
 //        verticalArrangement = Arrangement.Center
     ) {
         ProfileImage()
-        ProfileText(notificationManager, context)
+        ProfileText(context)
     }
 }
 
@@ -146,7 +145,7 @@ fun ProfileImage() {
 
 //@Preview(showBackground = true)
 @Composable
-fun ProfileText(notificationManager: NotificationManager, context: Context) {
+fun ProfileText(context: Context) {
     Column {
         Row(
             modifier = Modifier
@@ -210,7 +209,7 @@ fun ProfileText(notificationManager: NotificationManager, context: Context) {
         ) {
             Box(modifier = Modifier
                 .clickable {
-                    notificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotificationEmergency(
                         context,
                         "警告",
                         "前方路口有救護車從左側出沒！請減速！",
@@ -228,7 +227,7 @@ fun ProfileText(notificationManager: NotificationManager, context: Context) {
             }
             Box(modifier = Modifier
                 .clickable {
-                    notificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotificationEmergency(
                         context,
                         "警告",
                         "前方路口有救護車從右側出沒！請減速！",
