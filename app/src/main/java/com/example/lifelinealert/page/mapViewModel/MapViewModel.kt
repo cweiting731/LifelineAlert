@@ -1,8 +1,12 @@
 package com.example.lifelinealert.page.mapViewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lifelinealert.utils.map.Directions.fetchRoute
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -21,6 +25,23 @@ class MapViewModel : ViewModel() {
 
     // default start point
     private val nckuLibrary = LatLng(22.999973101427155, 120.21985214463398)
+
+    val locationCallback: LocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            if(!_uiState.value.allowCameraTracing) return
+            Log.v("location", "tracking")
+            val location = locationResult.lastLocation
+            location ?: return
+            val curLocation = LatLng(location.latitude, location.longitude)
+            val curBearing = location.bearing
+            _uiState.value = _uiState.value.copy(userCameraPosition = CameraPosition.Builder()
+                .target(curLocation)
+                .zoom(17f)
+                .bearing(curBearing)
+                .build()
+            )
+        }
+    }
 
     init {
         startTargetFetchingSimulating()
@@ -53,6 +74,18 @@ class MapViewModel : ViewModel() {
             }
 
             _uiState.value = _uiState.value.copy(polylinePaths = updatedPaths)
+        }
+    }
+
+    fun myLocationButtonClick(): Boolean {
+        _uiState.value = _uiState.value.copy(allowCameraTracing = !_uiState.value.allowCameraTracing)
+        return false
+    }
+
+    fun mapDrag(): Unit{
+        Log.v("onMapDrag", "map is dragged")
+        if(_uiState.value.allowCameraTracing){
+            _uiState.value = _uiState.value.copy(allowCameraTracing = false)
         }
     }
 }
