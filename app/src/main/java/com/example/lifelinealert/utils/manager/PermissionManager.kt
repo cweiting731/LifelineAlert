@@ -51,6 +51,7 @@ object PermissionManager {
     }
 
     fun handlePermissionResult(activity: Activity, permissions: Array<String>, grantResults: IntArray) {
+        var ungrantedPermissions: String = ""
         for (i in permissions.indices) {
             val permission = permissions[i]
             val grantResult = grantResults[i]
@@ -63,15 +64,29 @@ object PermissionManager {
                 // 沒有permission 且已無重複次數
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     Log.v("permission", "$permission never ask, change to setting")
-                    showDialog.value = true
-                    val title = alertDialogPermissionTitle[permission]
-                    alertDialogDescription.value = "Lifeline Alert 需要 $title 的權限"
+                    ungrantedPermissions += alertDialogPermissionTitle[permission] + " "
+//                    showDialog.value = true
+//                    val title = alertDialogPermissionTitle[permission]
+//                    alertDialogDescription.value = "Lifeline Alert 需要 $title 的權限"
                 }
                 // 沒有permission 但有重複次數
                 else {
                     Log.v("permission", "$permission denied, still can ask")
                 }
             }
+        }
+
+        if (ungrantedPermissions != "") {
+            val message = "Lifeline Alert 需要 ${ungrantedPermissions}的權限"
+            val actionLabel = "設定"
+
+            SnackbarManager.showMessage(
+                message = message,
+                actionLabel = actionLabel,
+                action = {
+                    showPermissionSettingDialog(activity)
+                }
+            )
         }
     }
 
@@ -100,4 +115,5 @@ object PermissionManager {
             )
         }
     }
+
 }

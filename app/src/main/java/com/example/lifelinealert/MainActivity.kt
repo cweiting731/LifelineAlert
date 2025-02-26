@@ -12,10 +12,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,6 +34,7 @@ import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
 import com.example.lifelinealert.utils.manager.NotificationManager
 import com.example.lifelinealert.utils.manager.PermissionManager
+import com.example.lifelinealert.utils.manager.SnackbarManager
 
 
 class MainActivity : ComponentActivity() {
@@ -57,7 +62,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MainPage()
-            PermissionManager.AlertDialog(activity = this)
         }
 
     }
@@ -90,7 +94,7 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
         Log.v("lowerSystem", "restart")
-//        PermissionManager.requestPermissions(this)
+        PermissionManager.requestPermissions(this)
     }
 
     override fun onStop() {
@@ -123,9 +127,12 @@ class MainActivity : ComponentActivity() {
 fun MainPage() {
 
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { BottomNavigationBar(navController) },
+        snackbarHost = { SnackbarHost(hostState = SnackbarManager.snackbarHostState) }
     ) { innerPadding ->
         NavHostContainer(navController, Modifier.padding(innerPadding))
     }
@@ -167,9 +174,9 @@ fun BottomNavigationBar(navController: NavHostController) {
                     Icon(
                         painter = painterResource(id = page.icon),
                         contentDescription = stringResource(id = page.title),
-
                         )
-                })
+                }
+            )
         }
     }
 }
