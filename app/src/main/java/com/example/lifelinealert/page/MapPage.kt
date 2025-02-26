@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -88,7 +87,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = bottomBarHeight)
+//            .padding(bottom = bottomBarHeight)
     ) {
         if (fineLocationPermissionHandler.isGranted(context) || fineLocationPermissionState.status.isGranted) {
             GoogleMap(

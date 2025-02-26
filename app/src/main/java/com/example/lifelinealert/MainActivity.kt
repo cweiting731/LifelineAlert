@@ -7,23 +7,31 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -125,16 +133,23 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun MainPage() {
-
     val navController = rememberNavController()
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        snackbarHost = { SnackbarHost(hostState = SnackbarManager.snackbarHostState) }
+//        bottomBar = { BottomNavigationBar(navController) },
+        snackbarHost = { SnackbarHost(hostState = SnackbarManager.snackbarHostState) },
     ) { innerPadding ->
-        NavHostContainer(navController, Modifier.padding(innerPadding))
+        NavHostContainer(navController,
+            Modifier
+                .padding(innerPadding)
+                .fillMaxSize())
+
+        Column {
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f, true))
+            BottomNavigationBar(navController = navController)
+        }
     }
 
 }
@@ -159,8 +174,18 @@ fun BottomNavigationBar(navController: NavHostController) {
         Page.Profile,
         Page.Point
     )
-    NavigationBar {
+    Row (
+        modifier = Modifier
+            .padding(10.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(color = Color(0xCCF2EDF7)),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         val currentRoute = getCurrentRoute(navController = navController)
+        val selectedColor = Color(0xFF6650a4)
+        val unselectedColor = Color(0xFF000000)
+
         pages.forEach { page ->
             NavigationBarItem(
                 onClick = {
@@ -174,12 +199,62 @@ fun BottomNavigationBar(navController: NavHostController) {
                     Icon(
                         painter = painterResource(id = page.icon),
                         contentDescription = stringResource(id = page.title),
-                        )
+                        tint = if (currentRoute == page.route) selectedColor else unselectedColor
+                    )
                 }
             )
         }
     }
 }
+
+//@Composable
+//fun BottomNavigationBar(navController: NavHostController) {
+//    val pages = listOf(
+//        Page.Map,
+//        Page.Profile,
+//        Page.Point
+//    )
+//    NavigationBar(
+//        modifier = Modifier
+//            .height(100.dp)
+//            .padding(10.dp)
+//            .clip(RoundedCornerShape(20.dp)),
+//
+//        containerColor = Color(0xCCF2EDF7),
+//
+//    ) {
+//        val currentRoute = getCurrentRoute(navController = navController)
+//        val selectedColor = Color(0xFF6650a4)
+//        val unselectedColor = Color(0xFF000000)
+//
+//        Row(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalArrangement = Arrangement.Center,
+//            verticalAlignment = Alignment.CenterVertically,
+//        ) {
+//            pages.forEach { page ->
+//                NavigationBarItem(
+//                    modifier = Modifier.padding(10.dp),
+//                    onClick = {
+//                        if (page.route != currentRoute) {
+//                            navController.navigate(page.route)
+//                        }
+//                    },
+//                    selected = (currentRoute == page.route),
+//                    label = { Text(text = stringResource(id = page.title), fontSize = 12.sp) },
+//                    icon = {
+//                        Icon(
+//                            painter = painterResource(id = page.icon),
+//                            contentDescription = stringResource(id = page.title),
+//                            tint = if (currentRoute == page.route)  selectedColor else unselectedColor
+//                        )
+//                    },
+//
+//                )
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modifier) {
