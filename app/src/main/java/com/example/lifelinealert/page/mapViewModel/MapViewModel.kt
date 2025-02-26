@@ -82,7 +82,7 @@ class MapViewModel : ViewModel() {
         return false
     }
 
-    fun mapDrag(): Unit{
+    fun mapDrag() {
         Log.v("onMapDrag", "map is dragged")
         if(_uiState.value.allowCameraTracing){
             _uiState.value = _uiState.value.copy(allowCameraTracing = false)
