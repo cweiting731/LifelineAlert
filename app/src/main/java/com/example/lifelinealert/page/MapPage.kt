@@ -29,16 +29,15 @@ import com.example.lifelinealert.R
 import com.example.lifelinealert.page.mapViewModel.MapViewModel
 import com.example.lifelinealert.utils.map.FineLocationPermissionHandler
 import com.example.lifelinealert.utils.map.FineLocationProvider
-import com.example.lifelinealert.utils.map.FineLocationProvider.locationCallback
-import com.example.lifelinealert.utils.map.FineLocationProvider.locationRequest
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraMoveStartedReason
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -56,38 +55,22 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     val nckuLibrary = mapUiState.nckuLibrary
     val targetLocations = mapUiState.locations
     val polylinePaths = mapUiState.polylinePaths
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(nckuLibrary, 15f)
-    }
+    val userCameraPosition = mapUiState.userCameraPosition
+    val cameraPositionState = rememberCameraPositionState { position = userCameraPosition }
     // 權限相關
     val fineLocationPermissionHandler = FineLocationPermissionHandler()
     val context = LocalContext.current
     // UI values
     val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
-    // notificationManager
-    val notificationManager = mapUiState.notificationManager // 訊息傳送裝置
     val fineLocationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
 
     LaunchedEffect(Unit) {
         Log.v("FineLocationProvider", "compose create")
     }
-
-    DisposableEffect(context, fineLocationPermissionState) {
-        if (context is Activity) {
-            Log.v("FineLocationProvider", "start LocationUpdates")
-            try {
-                FineLocationProvider.requestLocationUpdates(context)
-            } catch (e: Exception) {
-                Log.v("FineLocationProvider", "start LocationUpdates")
-            }
-        }
-        onDispose {
-            Log.v("FineLocationProvider", "end LocationUpdates")
-            Log.v("FineLocationProvider", "compose dispose")
-            FineLocationProvider.removeLocationUpdates()
-        }
-    }
+    MapAnimateEffect(cameraPositionState, mapViewModel)
+    UserLocationUpdateEffect(mapViewModel) // userLocation register
+    MapOnDragEffect(cameraPositionState, mapViewModel)
 
     Box(
         modifier = Modifier
@@ -103,7 +86,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                     myLocationButtonEnabled = true // 啟用定位按鈕
                 ),
                 onMyLocationButtonClick = {
-                    false
+                    mapViewModel.myLocationButtonClick()
                 },
             ) {
                 Marker(
@@ -150,6 +133,72 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
             ) {
                 Text("需要精準位置權限授權，點擊跳轉設定")
             }
+        }
+    }
+}
+
+@Composable
+fun MapAnimateEffect(
+    cameraPositionState: CameraPositionState,
+    mapViewModel: MapViewModel = viewModel()
+) {
+    val mapState by mapViewModel.uiState.collectAsState()
+    val userCameraPosition = mapState.userCameraPosition
+    val allowCameraTracing = mapState.allowCameraTracing
+    val fineLocationPermissionHandler = FineLocationPermissionHandler()
+    val context = LocalContext.current
+
+    // map myLocation animate
+    LaunchedEffect(userCameraPosition) {
+        if (!fineLocationPermissionHandler.isGranted(context) ||
+            !allowCameraTracing
+        ) {
+            return@LaunchedEffect
+        }
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newCameraPosition(userCameraPosition),
+            durationMs = 700
+        )
+        Log.v("oncalltest", "$userCameraPosition")
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun UserLocationUpdateEffect(
+    mapViewModel: MapViewModel = viewModel()
+) {
+    val context = LocalContext.current
+    val fineLocationPermissionState =
+        rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
+    val locationCallback = mapViewModel.locationCallback
+
+    // userLocation register
+    DisposableEffect(context, fineLocationPermissionState) {
+        if (context is Activity) {
+            Log.v("FineLocationProvider", "start LocationUpdates")
+            try {
+                FineLocationProvider.requestLocationUpdates(context, locationCallback)
+            } catch (e: Exception) {
+                Log.v("FineLocationProvider", "start LocationUpdates")
+            }
+        }
+        onDispose {
+            Log.v("FineLocationProvider", "end LocationUpdates")
+            Log.v("FineLocationProvider", "compose dispose")
+            FineLocationProvider.removeLocationUpdates()
+        }
+    }
+}
+
+@Composable
+fun MapOnDragEffect(
+    cameraPositionState: CameraPositionState,
+    mapViewModel: MapViewModel = viewModel()
+) {
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+            mapViewModel.mapDrag()
         }
     }
 }
