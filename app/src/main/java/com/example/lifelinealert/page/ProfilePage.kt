@@ -19,8 +19,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -52,6 +54,7 @@ import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
 import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
+import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
 import com.example.lifelinealert.utils.manager.NotificationManager
 import kotlinx.coroutines.launch
 
@@ -61,7 +64,15 @@ import kotlinx.coroutines.launch
 fun ProfilePage(profileViewModel: ProfileViewModel = viewModel()) {
     val profileUiState by profileViewModel.uiState.collectAsState()
     val context = LocalContext.current
-    NotificationManager.createNotificationChannel(context, "emergency")
+    NotificationManager.createNotificationChannel(
+        context = context,
+        name = "ProfileTest",
+        channelId = "emergency",
+        importance = IMPORTANCE_HIGH,
+        descriptionText = "test",
+        soundUri = null,
+        audioAttributes = null
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -207,6 +218,7 @@ fun ProfileText(context: Context) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+            // left
             Box(modifier = Modifier
                 .clickable {
                     NotificationManager.sendNotificationEmergency(
@@ -220,11 +232,12 @@ fun ProfileText(context: Context) {
                 .size(100.dp)
             ) {
                 Image(
-                    imageVector = Icons.Default.Share,
+                    imageVector = Icons.Default.KeyboardArrowLeft,
                     contentDescription = "left",
                     modifier = Modifier.fillMaxSize()
                 )
             }
+            // right
             Box(modifier = Modifier
                 .clickable {
                     NotificationManager.sendNotificationEmergency(
@@ -238,8 +251,45 @@ fun ProfileText(context: Context) {
                 .size(100.dp)
             ) {
                 Image(
-                    imageVector = Icons.Default.PlayArrow,
+                    imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "right",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            // front
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotificationEmergency(
+                        context,
+                        "警告",
+                        "車輛前方有救護車接近！請減速！",
+                        "emergency",
+                        "front"
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "front",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotificationEmergency(
+                        context,
+                        "警告",
+                        "車輛後方有救護車接近！請減速！",
+                        "emergency",
+                        "back"
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "back",
                     modifier = Modifier.fillMaxSize()
                 )
             }

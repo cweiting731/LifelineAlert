@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
+import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
 import com.example.lifelinealert.utils.manager.NotificationManager
 import com.example.lifelinealert.utils.manager.PermissionManager
 import com.example.lifelinealert.utils.manager.SnackbarManager
@@ -62,11 +63,20 @@ class MainActivity : ComponentActivity() {
 
 //        notificationManager.createNotificationChannel(this)
 
-        NotificationManager.createNotificationChannel(this, "foreground_channel")
-        NotificationManager.createNotificationChannel(this, left_channelId)
-        NotificationManager.createNotificationChannel(this, right_channelId)
+        NotificationManager.createNotificationChannel(
+            context = this,
+            name = "foreground",
+            channelId = "foreground",
+            importance = IMPORTANCE_HIGH,
+            descriptionText = "foreground",
+            soundUri = null,
+            audioAttributes = null
+        )
 
 //        notificationManager.sendNotification(this, "System", "OnCreate")
+
+//        val gpsForegroundService = Intent(this, GpsForegroundService::class.java)
+//        startForegroundService(gpsForegroundService)
 
         setContent {
             MainPage()

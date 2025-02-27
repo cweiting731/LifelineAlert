@@ -1,26 +1,60 @@
 package com.example.lifelinealert.utils.manager
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
+import androidx.annotation.IntDef
 import androidx.core.app.NotificationCompat
 import com.example.lifelinealert.R
+
+const val IMPORTANCE_NONE = android.app.NotificationManager.IMPORTANCE_NONE
+const val IMPORTANCE_MIN = android.app.NotificationManager.IMPORTANCE_MIN
+const val IMPORTANCE_LOW = android.app.NotificationManager.IMPORTANCE_LOW
+const val IMPORTANCE_DEFAULT = android.app.NotificationManager.IMPORTANCE_DEFAULT
+const val IMPORTANCE_HIGH = android.app.NotificationManager.IMPORTANCE_HIGH
+
+const val LOCKSCREEN_VISIBILITY_PRIVATE = NotificationCompat.VISIBILITY_PRIVATE
+const val LOCKSCREEN_VISIBILITY_PUBLIC = NotificationCompat.VISIBILITY_PUBLIC
+const val LOCKSCREEN_VISIBILITY_SECRET = NotificationCompat.VISIBILITY_SECRET
 
 object NotificationManager {
     private val emergencySoundUri : Map<String, Uri> = mapOf(
         "left" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.left_emergency}"),
-        "right" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.right_emergency}")
+        "right" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.right_emergency}"),
+        "back" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.back_emergency}"),
+        "front" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.front_emergency}")
     )
 
+    @IntDef(IMPORTANCE_NONE, IMPORTANCE_MIN, IMPORTANCE_LOW, IMPORTANCE_DEFAULT, IMPORTANCE_HIGH)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class NotificationImportance
+
+    @IntDef(LOCKSCREEN_VISIBILITY_SECRET, LOCKSCREEN_VISIBILITY_PUBLIC, LOCKSCREEN_VISIBILITY_PRIVATE)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class NotificationLockscreenVisibility
+
     // 創建通知通道（Android 8.0 以上需要）
-    fun createNotificationChannel(context: Context, channelId: String) {
+    fun createNotificationChannel(
+        context: Context,
+        name: String,
+        channelId: String,
+        @NotificationImportance importance: Int = IMPORTANCE_DEFAULT,
+        descriptionText: String,
+        @NotificationLockscreenVisibility lockscreenVisibilityId: Int = LOCKSCREEN_VISIBILITY_PUBLIC,
+        light: Boolean = false,
+        vibration: Boolean = true,
+        showBadge: Boolean = true,
+        soundUri: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+        audioAttributes: AudioAttributes? = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
+    ) {
         val channel = NotificationChannel(
             channelId, // 通道 ID
-            "背景通知",        // 通道名稱
-            NotificationManager.IMPORTANCE_HIGH,
+            name,      // 通道名稱
+            importance, // 重要程度
         ).apply {
 //            val uri = Uri.Builder()
 //                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
@@ -32,12 +66,12 @@ object NotificationManager {
 //                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
 //                .build()
 
-            description = "這是前景服務通知頻道"
-            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            enableLights(true)
-            enableVibration(true)
-            setShowBadge(true) // 小紅點 未讀通知
-            setSound(null, null)
+            description = descriptionText
+            lockscreenVisibility = lockscreenVisibilityId
+            enableLights(light)
+            enableVibration(vibration)
+            setShowBadge(showBadge) // 小紅點 未讀通知
+            setSound(soundUri, audioAttributes)
         }
         val manager = context.getSystemService(NotificationManager::class.java)
 //        manager?.deleteNotificationChannel(channelId)
