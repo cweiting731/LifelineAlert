@@ -84,47 +84,6 @@ object NotificationManager {
         notificationManager?.notify(1, notification) // 發送通知，確保 notificationManager 不是 null
     }
 
-//    fun sendNotificationEmergency(
-//        context: Context,
-//        title: String,
-//        message: String,
-////        mainActivity: Class<out Activity>, // 會建一個新的Activity 避免錯誤以及記憶體洩漏
-//        channelId: String
-//    ) {
-////        val intent = Intent(context, mainActivity) // 點擊通知後跳轉到指定 Activity
-////        val pendingIntent = PendingIntent.getActivity(
-////            context,
-////            0,
-////            intent,
-////            PendingIntent.FLAG_MUTABLE
-////        )
-//
-////        val soundUri: Uri = emergencySoundUri[channelId] ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-//
-//        val notification = NotificationCompat.Builder(context, channelId)
-//            .setContentTitle(title)
-//            .setContentText(message)
-//            .setSmallIcon(R.drawable.ic_launcher_foreground)
-//            .setCategory(NotificationCompat.CATEGORY_ALARM)
-//            .setPriority(NotificationCompat.PRIORITY_HIGH) // 彈出通知
-////            .setFullScreenIntent(pendingIntent, true) // 設為全螢幕通知
-//            .setVibrate(longArrayOf(0, 500, 1000)) // 震動設定
-//            .setAutoCancel(true) // 點擊後自動取消通知
-////            .setSound(soundUri)
-//            .setDefaults(NotificationCompat.DEFAULT_SOUND)
-//            .build()
-//        // 建立通知
-//
-//
-//        // 發送通知
-////        val notificationManager =
-////            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        val notificationManager = context.getSystemService(NotificationManager::class.java)
-//        notificationManager.notify(System.currentTimeMillis().toInt(), notification) // 發送通知
-//
-//        Log.v("notification", "send ${channelId} successfully")
-//    }
-
 
 }
 
