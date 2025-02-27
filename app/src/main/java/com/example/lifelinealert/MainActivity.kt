@@ -176,7 +176,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     )
     Row (
         modifier = Modifier
-            .padding(10.dp)
+            .padding(10.dp, 10.dp, 10.dp, 30.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(color = Color(0xCCF2EDF7)),
         horizontalArrangement = Arrangement.Center,
