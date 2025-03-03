@@ -1,9 +1,11 @@
 package com.example.lifelinealert
 
+import android.app.PictureInPictureParams
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.Rational
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -96,9 +98,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
+
+
         super.onPause()
         Log.v("lowerSystem", "pause")
-
 //        sendNotification(this)
 //        showDialog.value = true
 
@@ -120,6 +123,13 @@ class MainActivity : ComponentActivity() {
         Log.v("lowerSystem", "stop")
 //        val serviceIntent = Intent(this, ForeGroundService::class.java)
 //        ContextCompat.startForegroundService(this, serviceIntent)
+
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            Log.v("pip", "pip handler")
+//            val mapPipActivityIntent = Intent(this, MapPipActivity::class.java)
+//            startActivity(mapPipActivityIntent)
+//        }, 500)
+
         Handler(Looper.getMainLooper()).postDelayed({
 //            notificationManager.sendNotification(
 //                this,
@@ -137,6 +147,14 @@ class MainActivity : ComponentActivity() {
             )
 //            notificationManager.sendNotification(this, "test", "test")
         }, 5000)
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        val aspectRatio = Rational(40, 40)
+        val pipBuilder = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
+        enterPictureInPictureMode(pipBuilder.build())
+        Log.v("pip", "pip mode")
     }
 }
 
