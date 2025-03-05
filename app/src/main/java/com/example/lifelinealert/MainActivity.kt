@@ -1,6 +1,7 @@
 package com.example.lifelinealert
 
 import android.app.PictureInPictureParams
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -32,12 +33,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.page.MapPage
 import com.example.lifelinealert.page.PointPage
@@ -49,6 +49,7 @@ import com.example.lifelinealert.utils.manager.SnackbarManager
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: MainActivityViewModel
     private var showDialog = mutableStateOf(false)
     private var alertDialogTitle = mutableStateOf("警告")
     private var alertDialogMessage = mutableStateOf("OnPause")
@@ -58,6 +59,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
         // request permission
         PermissionManager.requestPermissions(this)
@@ -74,7 +76,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            MainPage()
+            MainPage(viewModel)
         }
 
     }
@@ -136,20 +138,36 @@ class MainActivity : ComponentActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        val aspectRatio = Rational(40, 40)
-        val pipBuilder = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
-        enterPictureInPictureMode(pipBuilder.build())
-        Log.v("pip", "pip mode")
+
+        if (viewModel.pageRoute.value == "map") {
+            val aspectRatio = Rational(40, 40)
+            val pipBuilder = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
+            enterPictureInPictureMode(pipBuilder.build())
+            Log.v("pip", "pip mode")
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+
+        if (isInPictureInPictureMode) {
+            viewModel.setShowController(false)
+        }
+        else {
+            viewModel.setShowController(true)
+        }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun MainPage() {
+fun MainPage(viewModel: MainActivityViewModel) {
     val navController = rememberNavController()
+    val showController by viewModel.showController
 
     Scaffold(
-//        bottomBar = { BottomNavigationBar(navController) },
         snackbarHost = { SnackbarHost(hostState = SnackbarManager.snackbarHostState) },
     ) { innerPadding ->
         NavHostContainer(navController,
@@ -157,14 +175,15 @@ fun MainPage() {
                 .padding(innerPadding)
                 .fillMaxSize())
 
-        Column {
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, true))
-            BottomNavigationBar(navController = navController)
+        if (showController) {
+            Column {
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, true))
+                BottomNavigationBar(navController = navController, viewModel = viewModel)
+            }
         }
     }
-
 }
 
 sealed class Page(
@@ -181,7 +200,7 @@ sealed class Page(
 
 //@Preview(showBackground = true)
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavHostController, viewModel: MainActivityViewModel) {
     val pages = listOf(
         Page.Map,
         Page.Profile,
@@ -195,7 +214,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val currentRoute = getCurrentRoute(navController = navController)
+        val currentRoute by viewModel.pageRoute
         val selectedColor = Color(0xFF6650a4)
         val unselectedColor = Color(0xFF000000)
 
@@ -204,6 +223,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 onClick = {
                     if (page.route != currentRoute) {
                         navController.navigate(page.route)
+                        viewModel.setPageRoute(page.route)
                     }
                 },
                 selected = (currentRoute == page.route),
