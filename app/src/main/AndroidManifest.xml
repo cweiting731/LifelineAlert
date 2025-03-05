@@ -43,9 +43,6 @@
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:exported="false"
             android:foregroundServiceType="location"/>
-        <activity android:name=".MapPipActivity"
-            android:supportsPictureInPicture="true"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"/>
     </application>
 
 </manifest>

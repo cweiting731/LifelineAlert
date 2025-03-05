@@ -121,14 +121,6 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         Log.v("lowerSystem", "stop")
-//        val serviceIntent = Intent(this, ForeGroundService::class.java)
-//        ContextCompat.startForegroundService(this, serviceIntent)
-
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            Log.v("pip", "pip handler")
-//            val mapPipActivityIntent = Intent(this, MapPipActivity::class.java)
-//            startActivity(mapPipActivityIntent)
-//        }, 500)
 
         Handler(Looper.getMainLooper()).postDelayed({
 //            notificationManager.sendNotification(
