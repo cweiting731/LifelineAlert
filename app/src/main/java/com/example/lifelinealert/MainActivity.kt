@@ -59,12 +59,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // request permission
         PermissionManager.requestPermissions(this)
-//        fineLocationPermissionHandler.requestPermission(this) // 請求發送位置權限
-//        notificationManager.requestNotificationPermission(this) // 請求發送訊息權限
 
-//        notificationManager.createNotificationChannel(this)
-
+        // create notification channel
         NotificationManager.createNotificationChannel(
             context = this,
             name = "foreground",
@@ -74,11 +72,6 @@ class MainActivity : ComponentActivity() {
             soundUri = null,
             audioAttributes = null
         )
-
-//        notificationManager.sendNotification(this, "System", "OnCreate")
-
-//        val gpsForegroundService = Intent(this, GpsForegroundService::class.java)
-//        startForegroundService(gpsForegroundService)
 
         setContent {
             MainPage()
@@ -227,55 +220,6 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
-//@Composable
-//fun BottomNavigationBar(navController: NavHostController) {
-//    val pages = listOf(
-//        Page.Map,
-//        Page.Profile,
-//        Page.Point
-//    )
-//    NavigationBar(
-//        modifier = Modifier
-//            .height(100.dp)
-//            .padding(10.dp)
-//            .clip(RoundedCornerShape(20.dp)),
-//
-//        containerColor = Color(0xCCF2EDF7),
-//
-//    ) {
-//        val currentRoute = getCurrentRoute(navController = navController)
-//        val selectedColor = Color(0xFF6650a4)
-//        val unselectedColor = Color(0xFF000000)
-//
-//        Row(
-//            modifier = Modifier.fillMaxSize(),
-//            horizontalArrangement = Arrangement.Center,
-//            verticalAlignment = Alignment.CenterVertically,
-//        ) {
-//            pages.forEach { page ->
-//                NavigationBarItem(
-//                    modifier = Modifier.padding(10.dp),
-//                    onClick = {
-//                        if (page.route != currentRoute) {
-//                            navController.navigate(page.route)
-//                        }
-//                    },
-//                    selected = (currentRoute == page.route),
-//                    label = { Text(text = stringResource(id = page.title), fontSize = 12.sp) },
-//                    icon = {
-//                        Icon(
-//                            painter = painterResource(id = page.icon),
-//                            contentDescription = stringResource(id = page.title),
-//                            tint = if (currentRoute == page.route)  selectedColor else unselectedColor
-//                        )
-//                    },
-//
-//                )
-//            }
-//        }
-//    }
-//}
-
 @Composable
 fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = Page.Map.route) {
@@ -283,10 +227,4 @@ fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modi
         composable(Page.Profile.route) { ProfilePage() }
         composable(Page.Point.route) { PointPage() }
     }
-}
-
-@Composable
-fun getCurrentRoute(navController: NavHostController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
 }
