@@ -54,8 +54,14 @@ import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
 import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
+import com.example.lifelinealert.utils.manager.BACK
+import com.example.lifelinealert.utils.manager.FRONT
 import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
+import com.example.lifelinealert.utils.manager.LEFT
+import com.example.lifelinealert.utils.manager.MediaManager
 import com.example.lifelinealert.utils.manager.NotificationManager
+import com.example.lifelinealert.utils.manager.PRIORITY_HIGH
+import com.example.lifelinealert.utils.manager.RIGHT
 import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText
@@ -221,12 +227,13 @@ fun ProfileText(context: Context) {
             // left
             Box(modifier = Modifier
                 .clickable {
-                    NotificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotification(
                         context,
                         "警告",
                         "前方路口有救護車從左側出沒！請減速！",
                         "emergency",
-                        "left"
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, LEFT) }
                     )
                 }
                 .size(100.dp)
@@ -240,12 +247,13 @@ fun ProfileText(context: Context) {
             // right
             Box(modifier = Modifier
                 .clickable {
-                    NotificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotification(
                         context,
                         "警告",
                         "前方路口有救護車從右側出沒！請減速！",
                         "emergency",
-                        "right"
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, RIGHT) }
                     )
                 }
                 .size(100.dp)
@@ -259,12 +267,13 @@ fun ProfileText(context: Context) {
             // front
             Box(modifier = Modifier
                 .clickable {
-                    NotificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotification(
                         context,
                         "警告",
                         "車輛前方有救護車接近！請減速！",
                         "emergency",
-                        "front"
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, FRONT) }
                     )
                 }
                 .size(100.dp)
@@ -277,12 +286,13 @@ fun ProfileText(context: Context) {
             }
             Box(modifier = Modifier
                 .clickable {
-                    NotificationManager.sendNotificationEmergency(
+                    NotificationManager.sendNotification(
                         context,
                         "警告",
                         "車輛後方有救護車接近！請減速！",
                         "emergency",
-                        "back"
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, BACK) }
                     )
                 }
                 .size(100.dp)

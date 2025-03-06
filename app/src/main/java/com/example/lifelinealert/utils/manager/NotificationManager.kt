@@ -20,14 +20,15 @@ const val LOCKSCREEN_VISIBILITY_PRIVATE = NotificationCompat.VISIBILITY_PRIVATE
 const val LOCKSCREEN_VISIBILITY_PUBLIC = NotificationCompat.VISIBILITY_PUBLIC
 const val LOCKSCREEN_VISIBILITY_SECRET = NotificationCompat.VISIBILITY_SECRET
 
-object NotificationManager {
-    private val emergencySoundUri : Map<String, Uri> = mapOf(
-        "left" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.left_emergency}"),
-        "right" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.right_emergency}"),
-        "back" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.back_emergency}"),
-        "front" to Uri.parse("android.resource://com.example.lifelinealert/${R.raw.front_emergency}")
-    )
+const val PRIORITY_MAX = NotificationCompat.PRIORITY_MAX
+const val PRIORITY_HIGH = NotificationCompat.PRIORITY_HIGH
+const val PRIORITY_DEFAULT = NotificationCompat.PRIORITY_DEFAULT
+const val PRIORITY_LOW = NotificationCompat.PRIORITY_LOW
+const val PRIORITY_MIN = NotificationCompat.PRIORITY_MIN
 
+object NotificationManager {
+
+    // 限制createNotificationChannel只能傳入特定的值
     @IntDef(IMPORTANCE_NONE, IMPORTANCE_MIN, IMPORTANCE_LOW, IMPORTANCE_DEFAULT, IMPORTANCE_HIGH)
     @Retention(AnnotationRetention.SOURCE)
     annotation class NotificationImportance
@@ -35,6 +36,10 @@ object NotificationManager {
     @IntDef(LOCKSCREEN_VISIBILITY_SECRET, LOCKSCREEN_VISIBILITY_PUBLIC, LOCKSCREEN_VISIBILITY_PRIVATE)
     @Retention(AnnotationRetention.SOURCE)
     annotation class NotificationLockscreenVisibility
+
+    @IntDef(PRIORITY_MAX, PRIORITY_HIGH, PRIORITY_DEFAULT, PRIORITY_LOW, PRIORITY_MIN)
+    @Retention(AnnotationRetention.SOURCE)
+    annotation class NotificationPriority
 
     // 創建通知通道（Android 8.0 以上需要）
     fun createNotificationChannel(
@@ -56,16 +61,6 @@ object NotificationManager {
             name,      // 通道名稱
             importance, // 重要程度
         ).apply {
-//            val uri = Uri.Builder()
-//                .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-//                .authority(context.packageName)
-//                .appendPath(context.resources.getResourceEntryName(R.raw.left_emergency))
-//                .build()
-//
-//            val attributes = AudioAttributes.Builder()
-//                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-//                .build()
-
             description = descriptionText
             lockscreenVisibility = lockscreenVisibilityId
             enableLights(light)
@@ -74,50 +69,30 @@ object NotificationManager {
             setSound(soundUri, audioAttributes)
         }
         val manager = context.getSystemService(NotificationManager::class.java)
-//        manager?.deleteNotificationChannel(channelId)
         manager?.createNotificationChannel(channel)
     }
 
     // 發送通知
-    fun sendNotification(context: Context, title: String, message: String) {
-        // 建立通知
-        val notification = NotificationCompat.Builder(context, "foreground_channel")
-            .setContentTitle(title)
-            .setContentText(message)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // 讓通知顯示彈出
-            .build()
-
-        // 確保使用 context 來取得 NotificationManager
-        val notificationManager = context.getSystemService(NotificationManager::class.java)
-        notificationManager?.notify(1, notification) // 發送通知，確保 notificationManager 不是 null
-    }
-
-    fun sendNotificationEmergency(context: Context, title: String, message: String, channelId: String, direction: String) {
-        val soundUri: Uri = emergencySoundUri[direction] ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-//        val uri = Uri.Builder()
-//            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-//            .authority(context.packageName)
-//            .appendPath(context.resources.getResourceEntryName(R.raw.left_emergency))
-//            .build()
-
-        val ringtone = RingtoneManager.getRingtone(context, soundUri)
-        ringtone.play()
-
+    fun sendNotification(
+        context: Context,
+        title: String,
+        message: String,
+        channelId: String,
+        @NotificationPriority priority: Int = PRIORITY_DEFAULT,
+        action: (() -> Unit)? = null
+    ) {
         // 建立通知
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // 讓通知顯示彈出
-            .setSound(null)
+            .setSmallIcon(R.drawable.app_icon)
+            .setPriority(priority)
             .build()
 
-        // 確保使用 context 來取得 NotificationManager
+        action?.invoke()
+
         val notificationManager = context.getSystemService(NotificationManager::class.java)
-        notificationManager?.notify(1, notification) // 發送通知，確保 notificationManager 不是 null
+        notificationManager?.notify(1, notification)
     }
-
-
 }
 
