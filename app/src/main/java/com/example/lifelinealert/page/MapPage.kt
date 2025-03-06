@@ -62,6 +62,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     val context = LocalContext.current
     // UI values
     val bottomBarHeight = 80.dp // default NavigationBarHeight is 80.dp
+    // notificationManager
     val fineLocationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
 
@@ -75,7 +76,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = bottomBarHeight)
+//            .padding(bottom = bottomBarHeight)
     ) {
         if (fineLocationPermissionHandler.isGranted(context) || fineLocationPermissionState.status.isGranted) {
             GoogleMap(

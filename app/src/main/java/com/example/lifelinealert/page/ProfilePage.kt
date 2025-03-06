@@ -1,11 +1,15 @@
 package com.example.lifelinealert.page
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +18,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
@@ -42,19 +53,40 @@ import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
+import com.example.lifelinealert.page.profileViewModel.ProfileViewModel
+import com.example.lifelinealert.utils.manager.BACK
+import com.example.lifelinealert.utils.manager.FRONT
+import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
+import com.example.lifelinealert.utils.manager.LEFT
+import com.example.lifelinealert.utils.manager.MediaManager
+import com.example.lifelinealert.utils.manager.NotificationManager
+import com.example.lifelinealert.utils.manager.PRIORITY_HIGH
+import com.example.lifelinealert.utils.manager.RIGHT
 import kotlinx.coroutines.launch
 
 // Profile Page use ProfileImage and ProfileText
 @Preview(showBackground = true)
 @Composable
-fun ProfilePage() {
+fun ProfilePage(profileViewModel: ProfileViewModel = viewModel()) {
+    val profileUiState by profileViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    NotificationManager.createNotificationChannel(
+        context = context,
+        name = "ProfileTest",
+        channelId = "emergency",
+        importance = IMPORTANCE_HIGH,
+        descriptionText = "test",
+        soundUri = null,
+        audioAttributes = null
+    )
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
 //        verticalArrangement = Arrangement.Center
     ) {
         ProfileImage()
-        ProfileText()
+        ProfileText(context)
     }
 }
 
@@ -130,7 +162,7 @@ fun ProfileImage() {
 
 //@Preview(showBackground = true)
 @Composable
-fun ProfileText() {
+fun ProfileText(context: Context) {
     Column {
         Row(
             modifier = Modifier
@@ -186,5 +218,93 @@ fun ProfileText() {
                 textAlign = TextAlign.Left
             )
         }
+
+        //////
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            // left
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotification(
+                        context,
+                        "警告",
+                        "前方路口有救護車從左側出沒！請減速！",
+                        "emergency",
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, LEFT) }
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = "left",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            // right
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotification(
+                        context,
+                        "警告",
+                        "前方路口有救護車從右側出沒！請減速！",
+                        "emergency",
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, RIGHT) }
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "right",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            // front
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotification(
+                        context,
+                        "警告",
+                        "車輛前方有救護車接近！請減速！",
+                        "emergency",
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, FRONT) }
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "front",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Box(modifier = Modifier
+                .clickable {
+                    NotificationManager.sendNotification(
+                        context,
+                        "警告",
+                        "車輛後方有救護車接近！請減速！",
+                        "emergency",
+                        PRIORITY_HIGH,
+                        { MediaManager.MediaPlay(context, BACK) }
+                    )
+                }
+                .size(100.dp)
+            ) {
+                Image(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "back",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+
+        //////
     }
 }
