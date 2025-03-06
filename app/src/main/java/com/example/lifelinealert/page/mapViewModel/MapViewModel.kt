@@ -29,7 +29,7 @@ class MapViewModel : ViewModel() {
     val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             if(!_uiState.value.allowCameraTracing) return
-            Log.v("location", "tracking")
+            Log.d("locationCallback", "tracking")
             val location = locationResult.lastLocation
             location ?: return
             val curLocation = LatLng(location.latitude, location.longitude)
@@ -52,29 +52,36 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             while (isActive) {
                 val updatedLocations = _uiState.value.locations.toMutableMap().apply {
-//                    put("A", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2198 + Math.random() * 0.001))
-//                    put("B", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2208 + Math.random() * 0.001))
-//                    put("C", LatLng(22.999973101427155 + Math.random() * 0.001, 120.2218 + Math.random() * 0.001))
+                    put("A", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2198 + (Math.random()-0.5) * 0.02))
+                    put("B", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2208 + (Math.random()-0.5) * 0.02))
+                    put("C", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("D", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("E", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("F", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("G", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("H", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("I", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
+                    put("J", LatLng(22.999973101427155 + (Math.random()-0.5) * 0.02, 120.2218 + (Math.random()-0.5) * 0.02))
                 }
 //                Log.d("ThreadInfo", "目前執行緒: ${Thread.currentThread().name}")
                 withContext(Dispatchers.Main) {
                     // update state
-                    _uiState.value = _uiState.value.copy(locations = updatedLocations)
                     fetchPathsForTargets(updatedLocations)
+                    _uiState.value = _uiState.value.copy(locations = updatedLocations)
+                    Log.d("startTargetFetchingSimulating", "目前執行緒: ${Thread.currentThread().name}, 更新location")
                 }
-                delay(2000) // 每 2 秒更新一次位置
+                delay(10000) // 每 10 秒更新一次位置
             }
         }
     }
 
-    private fun fetchPathsForTargets(targetLocations: Map<String, LatLng>) {
-        viewModelScope.launch {
+    private suspend fun fetchPathsForTargets(targetLocations: Map<String, LatLng>) {
             val updatedPaths = targetLocations.mapValues { (_, location) ->
                 fetchRoute(location, nckuLibrary)
             }
 
             _uiState.value = _uiState.value.copy(polylinePaths = updatedPaths)
-        }
+            Log.d("startTargetFetchingSimulating", "目前執行緒: ${Thread.currentThread().name}, 更新path")
     }
 
     fun myLocationButtonClick(): Boolean {
