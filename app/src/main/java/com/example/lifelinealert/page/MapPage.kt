@@ -66,7 +66,7 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)  // 跳轉觸發重組
 
     LaunchedEffect(Unit) {
-        Log.v("FineLocationProvider", "compose create")
+        Log.v("MapPage", "compose create")
     }
     MapAnimateEffect(cameraPositionState, mapViewModel)
     UserLocationUpdateEffect(mapViewModel) // userLocation register
@@ -83,7 +83,8 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(isMyLocationEnabled = true), // 啟用當前位置
                 uiSettings = MapUiSettings(
-                    myLocationButtonEnabled = true // 啟用定位按鈕
+                    myLocationButtonEnabled = true, // 啟用定位按鈕
+                    zoomControlsEnabled = false,
                 ),
                 onMyLocationButtonClick = {
                     mapViewModel.myLocationButtonClick()
@@ -94,11 +95,6 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                     title = "library",
                     snippet = "國立成功大學圖書館",
                 )
-                Marker(
-                    state = MarkerState(position = LatLng(22.996188, 120.219114)),
-                    title = "test",
-                    icon = resizeBitmap(R.drawable.ambulance_icon, 120, 120, context)
-                )
                 val colorList: List<Color> = listOf(
                     Color.Red,
                     Color.Green,
@@ -108,15 +104,16 @@ fun MapPage(mapViewModel: MapViewModel = viewModel()) {
                     Color.Magenta
                 )
                 targetLocations.forEach { (id, location) ->
-                    Marker(
-                        state = MarkerState(position = location),
-                        icon = resizeBitmap(R.drawable.ambulance_icon, 100, 100, context)
-                    )
                     polylinePaths[id]?.let { path ->
                         Polyline(
                             points = path,
-                            color = colorList.random(),
+                            color = Color.Red,
+//                            color = colorList.random(),
                             width = 8f
+                        )
+                        Marker(
+                            state = MarkerState(position = location),
+                            icon = resizeBitmap(R.drawable.ambulance_icon, 100, 100, context)
                         )
                     }
                 }
@@ -159,7 +156,7 @@ fun MapAnimateEffect(
             update = CameraUpdateFactory.newCameraPosition(userCameraPosition),
             durationMs = 700
         )
-        Log.v("oncalltest", "$userCameraPosition")
+        Log.d("MapAnimateEffect", "$userCameraPosition")
     }
 }
 
@@ -176,11 +173,11 @@ fun UserLocationUpdateEffect(
     // userLocation register
     DisposableEffect(context, fineLocationPermissionState) {
         if (context is Activity) {
-            Log.v("FineLocationProvider", "start LocationUpdates")
+            Log.d("UserLocationUpdateEffect", "start LocationUpdates")
             try {
                 FineLocationProvider.requestLocationUpdates(context, locationCallback)
             } catch (e: Exception) {
-                Log.v("FineLocationProvider", "start LocationUpdates")
+                Log.e("UserLocationUpdateEffect", e.toString())
             }
         }
         onDispose {
