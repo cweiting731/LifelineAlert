@@ -1,6 +1,5 @@
 package com.example.lifelinealert.page.mapViewModel
 
-import com.example.lifelinealert.utils.foreground.NotificationManager
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 

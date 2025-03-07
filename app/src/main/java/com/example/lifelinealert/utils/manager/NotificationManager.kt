@@ -85,7 +85,7 @@ object NotificationManager {
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.app_icon)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setPriority(priority)
             .build()
 
