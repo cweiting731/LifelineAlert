@@ -1,16 +1,16 @@
 package com.example.lifelinealert
 
-import android.app.PictureInPictureParams
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.Rational
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
+import com.example.lifelinealert.utils.foreground.GpsForegroundService
 import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
 import com.example.lifelinealert.utils.manager.MediaManager
 import com.example.lifelinealert.utils.manager.NotificationManager
@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity() {
             MainPage(viewModel)
         }
 
+        val gpsForegroundService = Intent(this, GpsForegroundService::class.java)
+        startForegroundService(gpsForegroundService)
     }
 
     override fun onRequestPermissionsResult(
@@ -106,12 +108,12 @@ class MainActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
 
-        if (viewModel.pageRoute.value == "map") {
-            val aspectRatio = Rational(40, 40)
-            val pipBuilder = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
-            enterPictureInPictureMode(pipBuilder.build())
-            Log.v("pip", "pip mode")
-        }
+//        if (viewModel.pageRoute.value == "map") {
+//            val aspectRatio = Rational(40, 40)
+//            val pipBuilder = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
+//            enterPictureInPictureMode(pipBuilder.build())
+//            Log.v("pip", "pip mode")
+//        }
     }
 
     override fun onPictureInPictureModeChanged(

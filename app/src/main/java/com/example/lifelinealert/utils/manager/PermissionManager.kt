@@ -41,6 +41,10 @@ object PermissionManager {
             unGrantedPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
         } else Log.v("permission", "fine location permission already on")
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14 (API 34)
+            unGrantedPermissions.add(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+        } else Log.v("permission", "foreground service location permission already on")
+
         if (unGrantedPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(activity, unGrantedPermissions.toTypedArray(), REQUEST_CODE)
         }
