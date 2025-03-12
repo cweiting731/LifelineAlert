@@ -17,13 +17,23 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
+import java.util.LinkedList
+import java.util.Queue
 
+data class Location(val latitude: Double, val longitude: Double)
 
 class GpsForegroundService: Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
 
+    private val database = Firebase.database.getReference("users")
+    private val userName = "Willy"
+
+    private var locations: Queue<Location> = LinkedList()
+    private val capacity: Int = 5
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -40,6 +50,10 @@ class GpsForegroundService: Service() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { location ->
                     Log.v("LocationService", "經度: ${location.longitude}, 緯度: ${location.latitude}")
+
+                    if (locations.size >= capacity) locations.poll()
+                    locations.offer(Location(location.latitude, location.longitude))
+                    packagingUserGpsData()
                 }
             }
         }
@@ -48,11 +62,27 @@ class GpsForegroundService: Service() {
         requestLocationUpdates()
     }
 
+    private fun packagingUserGpsData() {
+        val locationMap = locations.mapIndexed { index, location ->
+            index.toString() to location
+        }.toMap()
+
+        val userData = mapOf(
+            "lastUpdateTime" to System.currentTimeMillis(),
+            "location" to locationMap
+        )
+
+        database.child(userName).updateChildren(userData).addOnCompleteListener { task ->
+            if (task.isSuccessful) Log.v("firebase", "success")
+            else Log.v("firebase", "fail")
+        }
+    }
+
     private fun startForegroundService() {
         val notification = NotificationCompat.Builder(this, "GpsForegroundService")
             .setContentTitle("GPS 追蹤中")
             .setContentText("應用正在獲取 GPS 位置")
-            .setSmallIcon(R.drawable.app_icon)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
 
