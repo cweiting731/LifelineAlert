@@ -1,4 +1,4 @@
-package com.example.lifelinealert.utils.permissions
+package com.example.lifelinealert.utils.manager
 
 import android.Manifest
 import android.app.Activity
@@ -41,6 +41,10 @@ object PermissionManager {
             unGrantedPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
         } else Log.v("permission", "fine location permission already on")
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) { // Android 14 (API 34)
+            unGrantedPermissions.add(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+        } else Log.v("permission", "foreground service location permission already on")
+
         if (unGrantedPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(activity, unGrantedPermissions.toTypedArray(), REQUEST_CODE)
         }
@@ -51,6 +55,7 @@ object PermissionManager {
     }
 
     fun handlePermissionResult(activity: Activity, permissions: Array<String>, grantResults: IntArray) {
+        var ungrantedPermissions: String = ""
         for (i in permissions.indices) {
             val permission = permissions[i]
             val grantResult = grantResults[i]
@@ -63,15 +68,29 @@ object PermissionManager {
                 // 沒有permission 且已無重複次數
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     Log.v("permission", "$permission never ask, change to setting")
-                    showDialog.value = true
-                    val title = alertDialogPermissionTitle[permission]
-                    alertDialogDescription.value = "Lifeline Alert 需要 $title 的權限"
+                    ungrantedPermissions += alertDialogPermissionTitle[permission] + " "
+//                    showDialog.value = true
+//                    val title = alertDialogPermissionTitle[permission]
+//                    alertDialogDescription.value = "Lifeline Alert 需要 $title 的權限"
                 }
                 // 沒有permission 但有重複次數
                 else {
                     Log.v("permission", "$permission denied, still can ask")
                 }
             }
+        }
+
+        if (ungrantedPermissions != "") {
+            val message = "Lifeline Alert 需要 ${ungrantedPermissions}的權限"
+            val actionLabel = "設定"
+
+            SnackbarManager.showMessage(
+                message = message,
+                actionLabel = actionLabel,
+                action = {
+                    showPermissionSettingDialog(activity)
+                }
+            )
         }
     }
 
@@ -100,4 +119,5 @@ object PermissionManager {
             )
         }
     }
+
 }
