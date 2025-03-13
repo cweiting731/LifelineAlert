@@ -16,6 +16,7 @@ val directionsApiKey : String = secretProperties.getProperty("DIRECTIONS_API_KEY
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -92,6 +93,7 @@ dependencies {
     implementation(libs.androidx.material3)
 //    implementation(libs.androidx.datastore.preferences.core.jvm)
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
