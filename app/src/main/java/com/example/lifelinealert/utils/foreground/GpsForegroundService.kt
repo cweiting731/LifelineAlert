@@ -4,8 +4,11 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
@@ -53,7 +56,8 @@ class GpsForegroundService: Service() {
 
                     if (locations.size >= capacity) locations.poll()
                     locations.offer(Location(location.latitude, location.longitude))
-                    packagingUserGpsData()
+
+                    uploadLocationToServer()
                 }
             }
         }
@@ -62,36 +66,26 @@ class GpsForegroundService: Service() {
         requestLocationUpdates()
     }
 
-    private fun packagingUserGpsData() {
-        val locationMap = locations.mapIndexed { index, location ->
-            index.toString() to location
-        }.toMap()
-
-        val userData = mapOf(
-            "lastUpdateTime" to System.currentTimeMillis(),
-            "location" to locationMap
-        )
-
-        database.child(userName).updateChildren(userData).addOnCompleteListener { task ->
-            if (task.isSuccessful) Log.v("firebase", "success")
-            else Log.v("firebase", "fail")
-        }
-    }
-
     private fun startForegroundService() {
         val notification = NotificationCompat.Builder(this, "GpsForegroundService")
             .setContentTitle("GPS 追蹤中")
             .setContentText("應用正在獲取 GPS 位置")
-            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
 
-        startForeground(1, notification)
+        startForeground(10, notification)
+    }
+
+    private fun resizeBitmap(resourceId: Int, width: Int, height: Int, context: Context): Bitmap {
+        val imageBitmap = BitmapFactory.decodeResource(context.resources, resourceId)
+        val resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false)
+        return resizedBitmap
     }
 
     private fun requestLocationUpdates() {
         val locationRequest = LocationRequest.create().apply {
-            interval = 5000  // 每 5 秒獲取一次 GPS
+            interval = 15000  // 每 5 秒獲取一次 GPS
             fastestInterval = 2000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
@@ -102,9 +96,27 @@ class GpsForegroundService: Service() {
         }
     }
 
-    private fun uploadLocationToServer(lat: Double, lng: Double) {
-        // 這裡可以用 Retrofit、OkHttp 或 Firebase 來上傳位置
-        Log.d("Upload", "上傳到後端: ($lat, $lng)")
+    private fun uploadLocationToServer() {
+        val userData = packagingUserGpsData()
+
+        database.child(userName).updateChildren(userData).addOnCompleteListener { task ->
+            if (task.isSuccessful) Log.v("firebase", "success")
+            else Log.v("firebase", "fail")
+        }
+
+    }
+
+    private fun packagingUserGpsData() : Map<String, Any> {
+        val locationMap = locations.mapIndexed { index, location ->
+            index.toString() to location
+        }.toMap()
+
+        val userData = mapOf(
+            "lastUpdateTime" to System.currentTimeMillis(),
+            "location" to locationMap
+        )
+
+        return userData
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
