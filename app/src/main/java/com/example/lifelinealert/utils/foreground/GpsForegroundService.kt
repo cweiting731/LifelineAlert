@@ -15,24 +15,24 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.lifelinealert.R
+import com.example.lifelinealert.utils.manager.SnackbarManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
+import com.google.gson.Gson
 import java.util.LinkedList
 import java.util.Queue
 
 data class Location(val latitude: Double, val longitude: Double)
 
-class GpsForegroundService: Service() {
+class GpsForegroundService: Service(), WebsocketCallBack {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
 
-    private val database = Firebase.database.getReference("users")
+    private val webSocket = WebSocket("ws://192.168.209.98:8080", this)
     private val userName = "Willy"
 
     private var locations: Queue<Location> = LinkedList()
@@ -40,6 +40,7 @@ class GpsForegroundService: Service() {
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        webSocket.connect()
 
         val channel = NotificationChannel(
             "GpsForegroundService",
@@ -98,12 +99,8 @@ class GpsForegroundService: Service() {
 
     private fun uploadLocationToServer() {
         val userData = packagingUserGpsData()
-
-        database.child(userName).updateChildren(userData).addOnCompleteListener { task ->
-            if (task.isSuccessful) Log.v("firebase", "success")
-            else Log.v("firebase", "fail")
-        }
-
+        val jsonUserData = Gson().toJson(userData)
+        webSocket.sendMessage(jsonUserData)
     }
 
     private fun packagingUserGpsData() : Map<String, Any> {
@@ -125,5 +122,28 @@ class GpsForegroundService: Service() {
         super.onDestroy()
         Log.v("GpsForegroundService", "onDestroy")
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        webSocket.close()
+    }
+
+
+    // connect failure callback
+    override fun onSuccess() {
+        Log.v("WebSocket", "Connection successful in Service")
+        // 在這裡處理成功的情況，比如更新 UI 或執行其他操作
+    }
+
+    override fun onFailure(error: String?) {
+        Log.e("WebSocket", "Connection failed in Service: $error")
+        SnackbarManager.showMessage(
+            "與伺服器連接失敗!",
+            "重新連接",
+            {
+//                SnackbarManager.showMessage("連接中~")
+                webSocket.connect()
+            },
+            {
+
+            }
+        )
     }
 }
