@@ -27,8 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.lifelinealert.page.HomePage
 import com.example.lifelinealert.page.MapPage
-import com.example.lifelinealert.page.PointPage
 import com.example.lifelinealert.page.ProfilePage
 import com.example.lifelinealert.utils.manager.SnackbarManager
 
@@ -38,10 +38,9 @@ sealed class Page(
     val icon: Int
 ) {
     object Map : Page("map", R.string.page_map_title, R.drawable.ic_navigation_bar_map)
-    object Profile :
-        Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
-
+    object Profile : Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
     object Point : Page("point", R.string.page_point_title, R.drawable.ic_navigation_bar_point)
+    object Home : Page("home", R.string.page_home_title, R.drawable.ic_navigation_bar_home)
 }
 
 @Composable
@@ -72,9 +71,10 @@ fun MainPage(viewModel: MainActivityViewModel) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController, viewModel: MainActivityViewModel) {
     val pages = listOf(
+        Page.Home,
         Page.Map,
         Page.Profile,
-        Page.Point
+//        Page.Point,
     )
     Row (
         modifier = Modifier
@@ -112,9 +112,10 @@ fun BottomNavigationBar(navController: NavHostController, viewModel: MainActivit
 
 @Composable
 fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modifier) {
-    NavHost(navController = navController, startDestination = Page.Map.route) {
+    NavHost(navController = navController, startDestination = Page.Home.route) {
+        composable(Page.Home.route) { HomePage() }
         composable(Page.Map.route) { MapPage() }
         composable(Page.Profile.route) { ProfilePage() }
-        composable(Page.Point.route) { PointPage() }
+//        composable(Page.Point.route) { PointPage() }
     }
 }

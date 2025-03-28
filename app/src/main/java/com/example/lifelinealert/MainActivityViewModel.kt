@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 class MainActivityViewModel : ViewModel() {
     var showController = mutableStateOf(true)
         private set
-    var pageRoute = mutableStateOf("map")
+    var pageRoute = mutableStateOf("home")
         private set
 
     fun setShowController(value: Boolean) {
