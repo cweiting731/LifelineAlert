@@ -3,25 +3,18 @@ package com.example.lifelinealert
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 import com.example.lifelinealert.utils.foreground.GpsForegroundService
-import com.example.lifelinealert.utils.manager.IMPORTANCE_HIGH
-import com.example.lifelinealert.utils.manager.MediaManager
-import com.example.lifelinealert.utils.manager.NotificationManager
-import com.example.lifelinealert.utils.manager.PRIORITY_HIGH
 import com.example.lifelinealert.utils.manager.PermissionManager
-import com.example.lifelinealert.utils.manager.RIGHT
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel: MainActivityViewModel
-    private val right_channelId = "right_emergency"
+//    private val right_channelId = "right_emergency"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,15 +24,15 @@ class MainActivity : ComponentActivity() {
         PermissionManager.requestPermissions(this)
 
         // create notification channel
-        NotificationManager.createNotificationChannel(
-            context = this,
-            name = "foreground",
-            channelId = "foreground",
-            importance = IMPORTANCE_HIGH,
-            descriptionText = "foreground",
-            soundUri = null,
-            audioAttributes = null
-        )
+//        NotificationManager.createNotificationChannel(
+//            context = this,
+//            name = "foreground",
+//            channelId = "foreground",
+//            importance = IMPORTANCE_HIGH,
+//            descriptionText = "foreground",
+//            soundUri = null,
+//            audioAttributes = null
+//        )
 
         setContent {
             MainPage(viewModel)
@@ -85,24 +78,17 @@ class MainActivity : ComponentActivity() {
         super.onStop()
         Log.v("lowerSystem", "stop")
 
-        Handler(Looper.getMainLooper()).postDelayed({
-//            notificationManager.sendNotification(
+//        Handler(Looper.getMainLooper()).postDelayed({
+//            Log.v("lowerSystem", "notification testing")
+//            NotificationManager.sendNotification(
 //                this,
 //                "警告",
-//                "前方十字路口有救護車從右側出沒！請減速！"
+//                "前方路口有救護車從右側出沒！請減速！",
+//                right_channelId,
+//                PRIORITY_HIGH,
+//                action = { MediaManager.MediaPlay(this, RIGHT) }
 //            )
-            Log.v("lowerSystem", "notification testing")
-            NotificationManager.sendNotification(
-                this,
-                "警告",
-                "前方路口有救護車從右側出沒！請減速！",
-//                MainActivity::class.java,
-                right_channelId,
-                PRIORITY_HIGH,
-                action = { MediaManager.MediaPlay(this, RIGHT) }
-            )
-//            notificationManager.sendNotification(this, "test", "test")
-        }, 5000)
+//        }, 5000)
     }
 
     override fun onUserLeaveHint() {
