@@ -4,11 +4,14 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -50,6 +53,7 @@ fun HomePage() {
     ) {
         TopBar(context)
         Banner()
+
     }
 }
 
@@ -82,7 +86,10 @@ fun TopBar(context: Context) {
             fontSize = 20.sp,
             modifier = Modifier.weight(1f)
         )
-        Box(modifier = Modifier.clip(CircleShape)) {
+        Box(modifier = Modifier
+            .clip(CircleShape)
+            .clickable { /* TODO: */ }
+        ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
                 contentDescription = "notification",
@@ -97,32 +104,56 @@ fun TopBar(context: Context) {
 
 @Composable
 fun Banner() {
-    val times = 20 // 時間or次數
+    val time = "1分鐘25秒" // 時間or次數
     val backgroundColor = Color(0xFF214489)
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(1f)
-            .clip(RoundedCornerShape(20.dp))
-            .background(backgroundColor)
+    val viewMoreColor = Color(0xFFA5C3FF)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .clip(RoundedCornerShape(20.dp))
+                .background(backgroundColor)
+        ) {
+            Column {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp, bottom = 15.dp),
+                    text = "這個月\n您已經協助救護車節省了",
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp,
+                    color = Color.White
+                )
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 15.dp),
+                    text = time,
+                    textAlign = TextAlign.Center,
+                    fontSize = 50.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier
+            .fillMaxWidth()
+            .height(5.dp))
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(viewMoreColor)
+                .padding(10.dp)
+                .clickable { /* TODO: */ }
+        ) {
             Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 15.dp, bottom = 15.dp),
-                text = "恭喜你\n你這個月拯救了救護車",
-                textAlign = TextAlign.Center,
+                text = "View More",
                 fontSize = 30.sp,
-                color = Color.White
-            )
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 15.dp),
-                text = "${times}次",
-                textAlign = TextAlign.Center,
-                fontSize = 50.sp,
-                color = Color.White,
+                modifier = Modifier.padding(10.dp),
                 fontWeight = FontWeight.Bold
             )
         }
