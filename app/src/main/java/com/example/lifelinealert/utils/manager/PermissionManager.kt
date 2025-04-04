@@ -26,7 +26,7 @@ object PermissionManager {
         "android.permission.POST_NOTIFICATIONS" to "通知",
         "android.permission.ACCESS_FINE_LOCATION" to "位置"
     )
-    fun requestPermissions(activity: Activity) {
+    fun requestPermissions(activity: Activity): Boolean {
         val unGrantedPermissions = mutableListOf<String>()
         Log.v("permission", "requesting")
         // Post Notification 存取權限
@@ -47,7 +47,8 @@ object PermissionManager {
 
         if (unGrantedPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(activity, unGrantedPermissions.toTypedArray(), REQUEST_CODE)
-        }
+            return false // 不開service
+        } else return true // 開service 確保所有權限都有開啟
     }
 
     fun hasPermission(context: Context, permission: String): Boolean {
