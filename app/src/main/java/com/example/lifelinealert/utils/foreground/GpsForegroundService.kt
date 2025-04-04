@@ -39,6 +39,7 @@ class GpsForegroundService: Service(), WebsocketCallBack {
     private val capacity: Int = 5
     override fun onCreate() {
         super.onCreate()
+        Log.v("GpsForegroundService", "Start")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         webSocket.connect()
 
