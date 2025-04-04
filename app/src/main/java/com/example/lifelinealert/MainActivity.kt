@@ -21,18 +21,9 @@ class MainActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
         // request permission
-        PermissionManager.requestPermissions(this)
-
-        // create notification channel
-//        NotificationManager.createNotificationChannel(
-//            context = this,
-//            name = "foreground",
-//            channelId = "foreground",
-//            importance = IMPORTANCE_HIGH,
-//            descriptionText = "foreground",
-//            soundUri = null,
-//            audioAttributes = null
-//        )
+        if(PermissionManager.requestPermissions(this)) { // 代表所有權限都已開啟
+            startGpsForegroundService()
+        }
 
         setContent {
             MainPage(viewModel)
