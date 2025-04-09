@@ -1,6 +1,7 @@
 package com.example.lifelinealert.page
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -50,6 +51,7 @@ import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
+import com.example.lifelinealert.DevActivity
 import com.example.lifelinealert.R
 import com.example.lifelinealert.data.UserProfile
 import kotlinx.coroutines.launch
@@ -65,7 +67,7 @@ fun SettingPage() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         PersonalProfile(context = context)
-        SettingSection()
+        SettingSection(context = context)
     }   
 }
 
@@ -148,7 +150,7 @@ fun PersonalProfile(context: Context) {
 }
 
 @Composable
-fun SettingSection() {
+fun SettingSection(context: Context) {
     val settingTitleList = listOf(
         "音量",
         "通知",
@@ -156,7 +158,7 @@ fun SettingSection() {
         "Setting 4",
         "Setting 5",
         "Setting 6",
-        "Setting 7",
+        "開發人員選項",
     )
     val detailPage = listOf(
         null,
@@ -165,18 +167,12 @@ fun SettingSection() {
         null,
         null,
         null,
-        null,
+        {
+            val intent = Intent(context, DevActivity::class.java)
+            context.startActivity(intent)
+        },
     )
 
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clip(RoundedCornerShape(20.dp))
-//            .background(Color.LightGray)
-//            .padding(15.dp)
-//    ) {
-//
-//    }
     LazyColumn {
         itemsIndexed(settingTitleList) {index: Int, item: String ->
             SettingItem(title = item, detailPage = detailPage[index])
@@ -186,9 +182,9 @@ fun SettingSection() {
 }
 
 @Composable
-fun SettingItem(title: String, detailPage: Any?) {
+fun SettingItem(title: String, detailPage: (() -> Unit)?) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().clickable { detailPage?.invoke() }
     ) {
         Spacer(modifier = Modifier
             .fillMaxWidth()
