@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
     // request permission
-        PublicDataHolder.websocket = WebSocket("ws://192.168.209.98:8080")
+        PublicDataHolder.websocket = WebSocket(this)
         if(PermissionManager.requestPermissions(this)) { // 代表所有權限都已開啟
                 startGpsForegroundService()
         }
