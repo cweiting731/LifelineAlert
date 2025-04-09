@@ -15,6 +15,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import com.example.lifelinealert.R
+import com.example.lifelinealert.data.PublicDataHolder
 import com.example.lifelinealert.utils.manager.SnackbarManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -31,16 +32,18 @@ class GpsForegroundService: Service(), WebsocketCallBack {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private var webSocket = PublicDataHolder.websocket
 
-    private val webSocket = WebSocket("ws://192.168.209.98:8080", this)
     private val userName = "Willy"
 
     private var locations: Queue<Location> = LinkedList()
     private val capacity: Int = 5
     override fun onCreate() {
         super.onCreate()
+        Log.v("GpsForegroundService", "Start")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        webSocket.connect()
+        webSocket?.connectWebSocketCallBack(this)
+        webSocket?.connect()
 
         val channel = NotificationChannel(
             "GpsForegroundService",
@@ -55,8 +58,9 @@ class GpsForegroundService: Service(), WebsocketCallBack {
                 locationResult.lastLocation?.let { location ->
                     Log.v("LocationService", "經度: ${location.longitude}, 緯度: ${location.latitude}")
 
-                    if (locations.size >= capacity) locations.poll()
-                    locations.offer(Location(location.latitude, location.longitude))
+//                    if (locations.size >= capacity) locations.poll()
+//                    locations.offer(Location(location.latitude, location.longitude))
+                    PublicDataHolder.location = Location(location.latitude, location.latitude)
 
                     uploadLocationToServer()
                 }
@@ -100,17 +104,18 @@ class GpsForegroundService: Service(), WebsocketCallBack {
     private fun uploadLocationToServer() {
         val userData = packagingUserGpsData()
         val jsonUserData = Gson().toJson(userData)
-        webSocket.sendMessage(jsonUserData)
+        webSocket?.sendMessage(jsonUserData)
     }
 
     private fun packagingUserGpsData() : Map<String, Any> {
-        val locationMap = locations.mapIndexed { index, location ->
-            index.toString() to location
-        }.toMap()
+//        val locationMap = locations.mapIndexed { index, location ->
+//            index.toString() to location
+//        }.toMap()
 
         val userData = mapOf(
             "lastUpdateTime" to System.currentTimeMillis(),
-            "location" to locationMap
+            "location" to "latitude: ${PublicDataHolder.location?.latitude}\n" +
+                          "longitude: ${PublicDataHolder.location?.longitude}"
         )
 
         return userData
@@ -122,7 +127,7 @@ class GpsForegroundService: Service(), WebsocketCallBack {
         super.onDestroy()
         Log.v("GpsForegroundService", "onDestroy")
         fusedLocationClient.removeLocationUpdates(locationCallback)
-        webSocket.close()
+        webSocket?.close()
     }
 
 
@@ -139,7 +144,7 @@ class GpsForegroundService: Service(), WebsocketCallBack {
             "重新連接",
             {
 //                SnackbarManager.showMessage("連接中~")
-                webSocket.connect()
+                webSocket?.connect()
             },
             {
 

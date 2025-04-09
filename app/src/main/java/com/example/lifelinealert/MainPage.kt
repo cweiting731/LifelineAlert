@@ -29,7 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.lifelinealert.page.HomePage
 import com.example.lifelinealert.page.MapPage
-import com.example.lifelinealert.page.ProfilePage
+import com.example.lifelinealert.page.SettingPage
 import com.example.lifelinealert.utils.manager.SnackbarManager
 
 sealed class Page(
@@ -41,6 +41,7 @@ sealed class Page(
     object Profile : Page("profile", R.string.page_profile_title, R.drawable.ic_navigation_bar_profile)
     object Point : Page("point", R.string.page_point_title, R.drawable.ic_navigation_bar_point)
     object Home : Page("home", R.string.page_home_title, R.drawable.ic_navigation_bar_home)
+    object Setting : Page("setting", R.string.page_setting_title, R.drawable.ic_navigation_bar_setting)
 }
 
 @Composable
@@ -73,7 +74,8 @@ fun BottomNavigationBar(navController: NavHostController, viewModel: MainActivit
     val pages = listOf(
         Page.Home,
         Page.Map,
-        Page.Profile,
+        Page.Setting,
+//        Page.Profile,
 //        Page.Point,
     )
     Row (
@@ -115,7 +117,8 @@ fun NavHostContainer(navController: NavHostController, modifier: Modifier = Modi
     NavHost(navController = navController, startDestination = Page.Home.route) {
         composable(Page.Home.route) { HomePage() }
         composable(Page.Map.route) { MapPage() }
-        composable(Page.Profile.route) { ProfilePage() }
+        composable(Page.Setting.route) { SettingPage() }
+//        composable(Page.Profile.route) { ProfilePage() }
 //        composable(Page.Point.route) { PointPage() }
     }
 }

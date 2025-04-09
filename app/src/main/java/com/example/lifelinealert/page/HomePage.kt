@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -148,7 +149,7 @@ fun Banner() {
                 .clip(RoundedCornerShape(20.dp))
                 .background(viewMoreColor)
                 .padding(10.dp)
-                .clickable { /* TODO: */ }
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = { /* TODO: */ })
         ) {
             Text(
                 text = "View More",

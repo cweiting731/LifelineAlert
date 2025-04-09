@@ -1,6 +1,9 @@
 package com.example.lifelinealert
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +11,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
+import com.example.lifelinealert.data.PublicDataHolder
 import com.example.lifelinealert.utils.foreground.GpsForegroundService
+import com.example.lifelinealert.utils.foreground.WebSocket
 import com.example.lifelinealert.utils.manager.PermissionManager
 
 
@@ -20,26 +25,32 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
-        // request permission
-        PermissionManager.requestPermissions(this)
+    // request permission
+        PublicDataHolder.websocket = WebSocket(this)
+        if(PermissionManager.requestPermissions(this)) { // 代表所有權限都已開啟
+                startGpsForegroundService()
+        }
 
-        // create notification channel
-//        NotificationManager.createNotificationChannel(
-//            context = this,
-//            name = "foreground",
-//            channelId = "foreground",
-//            importance = IMPORTANCE_HIGH,
-//            descriptionText = "foreground",
-//            soundUri = null,
-//            audioAttributes = null
-//        )
 
         setContent {
             MainPage(viewModel)
         }
+    }
 
-        val gpsForegroundService = Intent(this, GpsForegroundService::class.java)
-        startForegroundService(gpsForegroundService)
+    private fun startGpsForegroundService() {
+        if (!isGpsServiceRunning()) {
+            val gpsForegroundService = Intent(this, GpsForegroundService::class.java)
+            startForegroundService(gpsForegroundService)
+        }
+    }
+    private fun isGpsServiceRunning(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+            if (GpsForegroundService::class.java.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun onRequestPermissionsResult(
@@ -50,6 +61,16 @@ class MainActivity : ComponentActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
             PermissionManager.handlePermissionResult(this, permissions, grantResults)
+
+            var judge = true
+            grantResults.forEach {
+                if (it != PackageManager.PERMISSION_GRANTED) {
+                    judge = false
+                }
+            }
+            if (judge) {
+                startGpsForegroundService()
+            }
         }
     }
 
@@ -71,7 +92,9 @@ class MainActivity : ComponentActivity() {
     override fun onRestart() {
         super.onRestart()
         Log.v("lowerSystem", "restart")
-        PermissionManager.requestPermissions(this)
+        if (PermissionManager.requestPermissions(this)) {
+            startGpsForegroundService()
+        }
     }
 
     override fun onStop() {
