@@ -11,7 +11,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
+import com.example.lifelinealert.data.PublicDataHolder
 import com.example.lifelinealert.utils.foreground.GpsForegroundService
+import com.example.lifelinealert.utils.foreground.WebSocket
 import com.example.lifelinealert.utils.manager.PermissionManager
 
 
@@ -23,10 +25,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
-        // request permission
+    // request permission
+        PublicDataHolder.websocket = WebSocket("ws://192.168.209.98:8080")
         if(PermissionManager.requestPermissions(this)) { // 代表所有權限都已開啟
-            startGpsForegroundService()
+                startGpsForegroundService()
         }
+
 
         setContent {
             MainPage(viewModel)

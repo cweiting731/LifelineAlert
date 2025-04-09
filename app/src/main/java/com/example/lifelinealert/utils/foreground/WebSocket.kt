@@ -7,10 +7,11 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
-class WebSocket(private val serverUrl: String, private val callBack: WebsocketCallBack) {
+class WebSocket(private val serverUrl: String) {
 
     private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
+    private var webSocketCallBack : WebsocketCallBack? = null
 
     fun connect() {
         val request = Request.Builder().url(serverUrl).build()
@@ -28,9 +29,13 @@ class WebSocket(private val serverUrl: String, private val callBack: WebsocketCa
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 super.onFailure(webSocket, t, response)
-                callBack.onFailure(t.message)
+                webSocketCallBack?.onFailure("${response}")
             }
         })
+    }
+
+    fun connectWebSocketCallBack(websocketCallBack: WebsocketCallBack) {
+        webSocketCallBack = websocketCallBack
     }
 
     fun sendMessage(message: String) {
